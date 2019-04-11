@@ -7,10 +7,10 @@ import { isArray } from 'util';
 
 export class RepoAnalyzerEngine {
   private readonly _logger!: winston.Logger;
-  private readonly _analyzersToWalkers:  Map<RepoAnalyzerBase, Map<any, CodeWalkerResultHandler[]>>;  
+  private readonly _analyzersToWalkers:  Map<RepoAnalyzerBase, Map<any, { handlers: CodeWalkerResultHandler<any>[], options?: any } >>;  
 
   constructor(private _repoRootPath: string, logger?: winston.Logger) {
-    this._analyzersToWalkers = new Map<RepoAnalyzerBase, Map<any, CodeWalkerResultHandler[]>>();
+    this._analyzersToWalkers = new Map<RepoAnalyzerBase, Map<any, { handlers: CodeWalkerResultHandler<any>[], options?: any }>>();
     this._logger = logger!;
 
     if (!this._logger) {
@@ -43,12 +43,12 @@ export class RepoAnalyzerEngine {
 
       sourceFiles.forEach(sourceFile => {
         const walkersToHandlers = this._analyzersToWalkers.get(analyzer)!;
-          walkersToHandlers.forEach((handlers, walker) => {
-            const instance = new walker(sourceFile);
+          walkersToHandlers.forEach((data, walker) => {
+            const instance = new walker(sourceFile, 'walker', data.options);
             instance.walk(sourceFile);
             const walkerResults = instance.getResults();
             
-            handlers.forEach(handler => {
+            data.handlers.forEach(handler => {
               handler(walkerResults);
             });
 
@@ -65,17 +65,29 @@ export class RepoAnalyzerEngine {
   }
   
 
-  registerWalker<T extends { new (...args: any[]): InstanceType<T> }>(callingAnalyzer: RepoAnalyzerBase, walker: T, handler?: CodeWalkerResultHandler): void {  
+  registerWalker<T extends { new (...args: any[]): InstanceType<T> } & { }>(callingAnalyzer: RepoAnalyzerBase, walker: T, handler?: CodeWalkerResultHandler<any>): void
+  registerWalker<T extends { new (...args: any[]): InstanceType<T> } & { }>(callingAnalyzer: RepoAnalyzerBase, walker: T, options?: any): void
+  registerWalker<T extends { new (...args: any[]): InstanceType<T> } & { }>(callingAnalyzer: RepoAnalyzerBase, walker: T, handler?: CodeWalkerResultHandler<any>, options?: any): void
+  registerWalker<T extends { new (...args: any[]): InstanceType<T> } & { }>(callingAnalyzer: RepoAnalyzerBase, walker: T, handlerOrOptions?: CodeWalkerResultHandler<any>, options?: any): void {
     if (!this._analyzersToWalkers.has(callingAnalyzer)) {
       !this._analyzersToWalkers.set(callingAnalyzer, new Map());
     }
+
+    let handler;
+
+    if (this.isResultHandler(handlerOrOptions)) {
+      handler = handlerOrOptions;
+      options = options;
+    } else {
+      options = handlerOrOptions;
+    }
     
     if (!this._analyzersToWalkers.get(callingAnalyzer)!.has(walker)) {
-      this._analyzersToWalkers.get(callingAnalyzer)!.set(walker, []);
+      this._analyzersToWalkers.get(callingAnalyzer)!.set(walker, { handlers: [], options });
     }
-
+ 
     if (handler) {
-      this._analyzersToWalkers.get(callingAnalyzer)!.get(walker)!.push(handler);
+      this._analyzersToWalkers.get(callingAnalyzer)!.get(walker)!.handlers.push(handler);
     }
   }
   
@@ -125,5 +137,9 @@ export class RepoAnalyzerEngine {
     }
 
     return project;
+  }
+
+  private isResultHandler(arg: any): arg is CodeWalkerResultHandler<any> {
+    return typeof arg === 'function';
   }
 }

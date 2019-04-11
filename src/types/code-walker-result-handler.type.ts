@@ -1,3 +1,3 @@
 import { CodeWalkerResultBase } from '..';
 
-export type CodeWalkerResultHandler = (results: CodeWalkerResultBase[]) => void
+export type CodeWalkerResultHandler<T extends CodeWalkerResultBase> = (results: T[]) => void

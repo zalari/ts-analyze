@@ -6,3 +6,4 @@ export class CodeWalkerDataResult<T> extends CodeWalkerResultBase {
     super(CodeWalkerResultKind.Data);
   }
 }
+

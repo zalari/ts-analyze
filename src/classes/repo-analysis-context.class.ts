@@ -8,8 +8,11 @@ export class RepoAnalysisContext {
     private _logger: winston.Logger) { 
   }
 
-  registerWalker<T extends { new (...args: any[]): InstanceType<T> } & { }>(walker: T, handler?: CodeWalkerResultHandler): void {
-    this._runner.registerWalker(this._analyzer, walker, handler);
+  registerWalker<T extends { new (...args: any[]): InstanceType<T> } & { }>(walker: T, handler?: CodeWalkerResultHandler<any>): void
+  registerWalker<T extends { new (...args: any[]): InstanceType<T> } & { }>(walker: T, options?: any): void
+  registerWalker<T extends { new (...args: any[]): InstanceType<T> } & { }>(walker: T, handler?: CodeWalkerResultHandler<any>, options?: any): void
+  registerWalker<T extends { new (...args: any[]): InstanceType<T> } & { }>(walker: T, handlerOrOptions?: CodeWalkerResultHandler<any>, options?: any): void {
+    this._runner.registerWalker(this._analyzer, walker, handlerOrOptions, options);
   }
 
   log(message: string) {
