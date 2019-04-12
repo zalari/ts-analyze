@@ -5,12 +5,15 @@ import { Project } from 'ts-morph';
 import { SourceFile, CompilerOptions, ScriptTarget, ModuleKind, ModuleResolutionKind, DiagnosticCategory } from 'typescript';
 import { isArray } from 'util';
 
+/**
+ * Engine for running repo analyzers.
+ */
 export class RepoAnalyzerEngine {
   private readonly _logger!: winston.Logger;
-  private readonly _analyzersToWalkers:  Map<RepoAnalyzerBase, Map<any, { handlers: CodeWalkerResultHandler<any>[], options?: any } >>;  
+  private readonly _analyzersToWalkers:  Map<RepoAnalyzerBase<any>, Map<any, { handlers: CodeWalkerResultHandler<any>[], options?: any } >>;  
 
   constructor(private _repoRootPath: string, logger?: winston.Logger) {
-    this._analyzersToWalkers = new Map<RepoAnalyzerBase, Map<any, { handlers: CodeWalkerResultHandler<any>[], options?: any }>>();
+    this._analyzersToWalkers = new Map<RepoAnalyzerBase<any>, Map<any, { handlers: CodeWalkerResultHandler<any>[], options?: any }>>();
     this._logger = logger!;
 
     if (!this._logger) {
@@ -22,18 +25,18 @@ export class RepoAnalyzerEngine {
     }
   }
 
-  run(analyzer: RepoAnalyzerBase): RepoAnalyzerResultBase<any>
-  run(analyzers: RepoAnalyzerBase[]): Map<RepoAnalyzerBase, RepoAnalyzerResultBase<any>>
-  run(analyzerOrArray: RepoAnalyzerBase | RepoAnalyzerBase[]): RepoAnalyzerResultBase<any> | Map<RepoAnalyzerBase, RepoAnalyzerResultBase<any>> {
-    let analyzers: RepoAnalyzerBase[];
+  run(analyzer: RepoAnalyzerBase<any>): RepoAnalyzerResultBase<any>
+  run(analyzers: RepoAnalyzerBase<any>[]): Map<RepoAnalyzerBase<any>, RepoAnalyzerResultBase<any>>
+  run(analyzerOrArray: RepoAnalyzerBase<any> | RepoAnalyzerBase<any>[]): RepoAnalyzerResultBase<any> | Map<RepoAnalyzerBase<any>, RepoAnalyzerResultBase<any>> {
+    let analyzers: RepoAnalyzerBase<any>[];
     
     if (!isArray(analyzerOrArray)) {
-      analyzers = [analyzerOrArray as RepoAnalyzerBase];
+      analyzers = [analyzerOrArray as RepoAnalyzerBase<any>];
     } else {
       analyzers = analyzerOrArray;
     }
 
-    const result: Map<RepoAnalyzerBase, RepoAnalyzerResultBase<any>> = new Map();
+    const result: Map<RepoAnalyzerBase<any>, RepoAnalyzerResultBase<any>> = new Map();
 
     analyzers.forEach(analyzer => {
       const context = new RepoAnalysisContext(this, analyzer, this._logger);
@@ -58,17 +61,14 @@ export class RepoAnalyzerEngine {
       });
 
     if (result.size == 1) {
-      return result.get(analyzerOrArray as RepoAnalyzerBase) as RepoAnalyzerResultBase<any>;
+      return result.get(analyzerOrArray as RepoAnalyzerBase<any>) as RepoAnalyzerResultBase<any>;
     }
 
     return result;
   }
   
 
-  registerWalker<T extends { new (...args: any[]): InstanceType<T> } & { }>(callingAnalyzer: RepoAnalyzerBase, walker: T, handler?: CodeWalkerResultHandler<any>): void
-  registerWalker<T extends { new (...args: any[]): InstanceType<T> } & { }>(callingAnalyzer: RepoAnalyzerBase, walker: T, options?: any): void
-  registerWalker<T extends { new (...args: any[]): InstanceType<T> } & { }>(callingAnalyzer: RepoAnalyzerBase, walker: T, handler?: CodeWalkerResultHandler<any>, options?: any): void
-  registerWalker<T extends { new (...args: any[]): InstanceType<T> } & { }>(callingAnalyzer: RepoAnalyzerBase, walker: T, handlerOrOptions?: CodeWalkerResultHandler<any>, options?: any): void {
+  registerWalker<TWalker extends { new (...args: any[]): InstanceType<TWalker> } & { }, TOptions>(callingAnalyzer: RepoAnalyzerBase<any>, walker: TWalker, handlerOrOptions?: CodeWalkerResultHandler<any> | TOptions, options?: TOptions): void {
     if (!this._analyzersToWalkers.has(callingAnalyzer)) {
       !this._analyzersToWalkers.set(callingAnalyzer, new Map());
     }

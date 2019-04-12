@@ -1,3 +1,4 @@
+// This is an example from TSLint only changed to use our own walker base type.
 // The walker takes care of all the work.
 import { CodeAutoWalkerBase } from '../src/api';
 import * as ts from 'typescript';

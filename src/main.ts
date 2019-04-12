@@ -6,7 +6,6 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import { RepoAnalyzerEngine } from './classes/repo-analyzer-engine.class';
-import { TemplateAnalyzer } from '../analyzers/template-analyzer';
 import { pascalCase } from 'change-case';
 
 const logger = winston.createLogger({
@@ -17,24 +16,29 @@ const logger = winston.createLogger({
   ]
 });
 
-const engine = new RepoAnalyzerEngine('C:/Users/Christian/source/infrastructure-test', logger);
 
+// TODO: Multiple paths and options that are passed to the analyzer.
 try {
   yargs
-    .command('run-analyzer [analyzer]', 'runs an analyzer', (y) => {
+    .command('run-analyzer [analyzer] [path]', 'runs an analyzer on the provided path', (y) => {
         y.positional('analyzer', {
             describe: 'analyzer to run'
         });
 
+        y.positional('path', {
+          describe: 'root path to run analyzer on'
+        });
+
         return y;
     }, (args) => {
+      const analyzerName = args.analyzer as string;
+      const analyzerInstance = loadAnalyzer(analyzerName, '.');
 
-        const analyzerName = args.analyzer as string;
-        const analyzerInstance = loadAnalyzer(analyzerName, '.');
+      const engine = new RepoAnalyzerEngine(args.path as string, logger);
 
-        const result = engine.run(analyzerInstance);
+      const result = engine.run(analyzerInstance);
 
-        console.log(result.asJson());
+      console.log(result.asJson());
     })
     .demandCommand(1, 'Please provide a command')
     .help()
@@ -51,7 +55,7 @@ function loadAnalyzer(name: string, ...args: any[]): any {
   const expectedFilePath = path.join(process.cwd(), 'dist', 'analyzers', `${name}-analyzer.js`);
 
   if (!fs.existsSync(expectedFilePath)) {
-    throw new Error(`Could not find locate analyzer: ${expectedFilePath}`);
+    throw new Error(`Could not locate analyzer: ${expectedFilePath}`);
   }
 
   const analyzerExport = require(expectedFilePath)[pascalCase(`${name}-analyzer`)];

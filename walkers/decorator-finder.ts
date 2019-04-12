@@ -1,8 +1,9 @@
 import { CodeWalkerBase, CodeWalkerDataResult } from '../src';
 import { SourceFile } from 'typescript';
 import { CodeWalkerNodeResult } from '../src/classes/code-walker-node-result.class';
+import { Node } from 'ts-morph';
 
-interface DecoratorCollectorOptions {
+export interface DecoratorFinderOptions {
     decoratorName: string | 'all';
     targets?: {
         classes?: boolean;
@@ -11,11 +12,19 @@ interface DecoratorCollectorOptions {
     }
 }
 
-export class DecoratorCollector extends CodeWalkerBase<DecoratorCollectorOptions> {
+/**
+ * Common purpose walker that locates decorators and returns the decorated nodes.
+ */
+export class DecoratorFinder extends CodeWalkerBase<DecoratorFinderOptions> {
+    static getDefaultOptions(): DecoratorFinderOptions {
+        return DecoratorFinder.prepareOptions();
+    }
+
     walk(sourceFile: SourceFile): void {
         const file = this.wrap(sourceFile);
-        const options = this.prepareOptions();
+        const options = DecoratorFinder.prepareOptions(this.options);
 
+        //TODO: Handle 'all'
         file.getClasses().forEach(classNode => {
             if (options.targets!.classes) {
 
@@ -42,10 +51,8 @@ export class DecoratorCollector extends CodeWalkerBase<DecoratorCollectorOptions
         });
     }
 
-    private prepareOptions(): DecoratorCollectorOptions {
-        let result: DecoratorCollectorOptions;
-        
-        if (!this.options) {
+    private static prepareOptions(options?: DecoratorFinderOptions): DecoratorFinderOptions {
+        if (!options) {
             return {
                 decoratorName: 'all',
                 targets: {
@@ -55,7 +62,7 @@ export class DecoratorCollector extends CodeWalkerBase<DecoratorCollectorOptions
                 }
             }
         } else {
-            const { decoratorName, targets } = this.options;
+            const { decoratorName, targets } = options;
 
             let classes = true;
             let methods = true;

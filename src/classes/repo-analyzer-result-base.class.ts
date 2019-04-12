@@ -1,9 +1,9 @@
-export class RepoAnalyzerResultBase<T> {
-    constructor(data: T) {
+export class RepoAnalyzerResultBase<TData> {
+    constructor(data: TData) {
         this.data = data;
     }
 
-    data: T;
+    data: TData;
 
     asJson(): string {
         return JSON.stringify(this.data, null, 2);
