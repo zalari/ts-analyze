@@ -43,8 +43,6 @@ try {
         searchPaths = searchPathsAndOptions.searchPaths;
         options = searchPathsAndOptions.options;        
       }
-      
-      console.log(searchPathsAndOptions)
 
       const analyzerInstance = loadAnalyzer(analyzerName, '.', searchPaths, options);
 
