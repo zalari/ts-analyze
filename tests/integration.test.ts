@@ -5,12 +5,12 @@ const engine = new RepoAnalyzerEngine(process.cwd());
 
 // Do some sanity checks on our own project
 test('Sanity Check', () => {
-  const enumsDirAnalyzer = new TemplateAnalyzer('/src/enums');
-  const classDirAnalyzer = new TemplateAnalyzer('/src/classes');
-  const withSearchPathsAnalyzer = new TemplateAnalyzer('.', [ '/src/enums', '/src/classes' ]);
+  const enumsDirAnalyzer = new TemplateAnalyzer('/src/enums', ['.'], { decoratorName: 'Test' });
+  const classDirAnalyzer = new TemplateAnalyzer('/src/classes', ['.'], { decoratorName: 'Test' });
+  const withSearchPathsAnalyzer = new TemplateAnalyzer('.', [ '/src/enums', '/src/classes' ], { decoratorName: 'Test' });
   
   const multiResult = engine.run([enumsDirAnalyzer, classDirAnalyzer, withSearchPathsAnalyzer]);
-  const singleResult = engine.run(new TemplateAnalyzer('.'));
+  const singleResult = engine.run(new TemplateAnalyzer('.', ['.'], { decoratorName: 'Test' }));
 
   // No classes in enums directory
   expect(enumsDirAnalyzer.nameResults.length).toBe(0)

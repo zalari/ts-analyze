@@ -1,4 +1,4 @@
-import { RepoAnalyzerBase, CodeWalkerResultBase, RepoAnalysisContext, RepoAnalyzerResultBase, CodeWalkerDataResult } from '../src/api';
+import { RepoAnalyzerWithOptionsBase, CodeWalkerResultBase, RepoAnalysisContext, RepoAnalyzerResultBase, CodeWalkerDataResult } from '../src/api';
 import { ClassNameCollector } from '../walkers/class-name-collector';
 import { DecoratorFinder } from '../walkers/decorator-finder';
 import { CodeWalkerNodeResult } from '../src/classes/code-walker-node-result.class';
@@ -8,19 +8,21 @@ interface TemplateAnalyzerResult {
   decoratorResults: CodeWalkerResultBase[];
 }
 
+interface TemplateAnalyzerOptions {
+  decoratorName: string;
+}
+
 @Test
-export class TemplateAnalyzer extends RepoAnalyzerBase<TemplateAnalyzerResult> {
+export class TemplateAnalyzer extends RepoAnalyzerWithOptionsBase<TemplateAnalyzerResult, TemplateAnalyzerOptions> {
   public nameResults: CodeWalkerResultBase[] = [];
   public decoratorResults: CodeWalkerResultBase[] = [];
 
   initialize(context: RepoAnalysisContext): void {
-
     // TODO: Mechanism/Typings to allow for automatic specific subtype that the handler will receive
     context.registerWalker(ClassNameCollector, (results: CodeWalkerResultBase[]) => this.handleClassNameResults(results));
-    
-    // TODO: Mechanism to get options passed from outside (from command line for example)
+
     const options = DecoratorFinder.getDefaultOptions();
-    options.decoratorName = 'Test';
+    options.decoratorName = this.options.decoratorName;
 
     context.registerWalker(DecoratorFinder, (results: CodeWalkerNodeResult[]) => this.handleDecoratorResults(results), options);
   }
