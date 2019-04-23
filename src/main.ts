@@ -16,23 +16,37 @@ const logger = winston.createLogger({
   ]
 });
 
-
-// TODO: Multiple paths and options that are passed to the analyzer.
 try {
   yargs
-    .command('run-analyzer [analyzer] [path]', 'runs an analyzer on the provided path', (y) => {
-        y.positional('analyzer', {
-            describe: 'analyzer to run'
-        });
+    .command('run-analyzer [analyzer] [path] [searchPathsAndOptions..]', 'runs an analyzer on the provided path', (y) => {
+      y.positional('analyzer', {
+        describe: 'analyzer to run'
+      });
 
-        y.positional('path', {
-          describe: 'root path to run analyzer on'
-        });
+      y.positional('path', {
+        describe: 'root path to run analyzer on'
+      });
 
-        return y;
+      y.positional('searchPathsAndOptions', {
+        describe: 'Allows passing search paths (relative to the root path) and options (as key value pairs) to pass to the parameter.'
+      })
+
+      return y;
     }, (args) => {
       const analyzerName = args.analyzer as string;
-      const analyzerInstance = loadAnalyzer(analyzerName, '.');
+      const searchPathsAndOptions = parseSearchPathsAndOptions(args.searchPathsAndOptions as string[])
+
+      let searchPaths;
+      let options;
+
+      if (searchPathsAndOptions) {
+        searchPaths = searchPathsAndOptions.searchPaths;
+        options = searchPathsAndOptions.options;        
+      }
+      
+      console.log(searchPathsAndOptions)
+
+      const analyzerInstance = loadAnalyzer(analyzerName, '.', searchPaths, options);
 
       const engine = new RepoAnalyzerEngine(args.path as string, logger);
 
@@ -50,6 +64,38 @@ try {
 }
 
 process.exit(0);
+
+function parseSearchPathsAndOptions(rawStrings: string[]): { options: object, searchPaths: string[] } | undefined {
+  if (!rawStrings) {
+    return undefined;
+  }
+
+  if (rawStrings.length === 0) {
+    return undefined;
+  }
+
+  const options = Object.create(null);
+  const searchPaths: string[] = [];
+  
+  try {
+    rawStrings.forEach(s => {
+      const [key, value] = s.split('=');
+      if (key && value) {      
+       options[key] = value;
+      } else {
+        searchPaths.push(s);
+      }
+    });
+  } catch {
+    throw new Error('Invalid options/searchPaths supplied');
+  }
+
+  if (searchPaths.length === 0) {
+    searchPaths.push('.');
+  }
+
+  return { options, searchPaths };
+}
 
 function loadAnalyzer(name: string, ...args: any[]): any {
   const expectedFilePath = path.join(process.cwd(), 'dist', 'analyzers', `${name}-analyzer.js`);
