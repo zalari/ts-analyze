@@ -1,4 +1,5 @@
 import { RepoAnalyzerBase, CodeWalkerResultHandler, RepoAnalysisContext, RepoAnalyzerResultBase } from '..';
+import fs from 'fs';
 import path from 'path';
 import winston from 'winston';
 import { Project } from 'ts-morph';
@@ -115,11 +116,22 @@ export class RepoAnalyzerEngine {
     const project = new Project({ compilerOptions });
 
     relativeSearchPaths.forEach(searchPath => {
-      const absoluteSearchPath = `${path.join(compilerOptions.rootDir!, searchPath)}`;
-      this._logger.info(`Adding search path to compilation: ${absoluteSearchPath}`);
+      const rootWithRelativePath = `${path.join(compilerOptions.rootDir!, searchPath)}`;
+      const tsConfigPaths = this.searchRecursive(rootWithRelativePath, 'tsconfig.json');
 
-      project.addExistingSourceFiles(`${absoluteSearchPath}/**/*.ts`);
+      tsConfigPaths.forEach(p => {
+          this._logger.info(`Found tsconfig.json at ${p}. Adding to compilation`);
+          project.addSourceFilesFromTsConfig(p);
+        
+      })
+
+      // Line below added searched node_modules as of ts-morph 2.0.1 which takes way too long.
+      // project.addExistingSourceFiles(`${absoluteSearchPath}/**/*.ts`);
     });
+
+    if (project.getSourceFiles().length === 0) {
+      throw new Error('No source files found');
+    }
 
     if (respectErrors) {
       const errors = project
@@ -142,4 +154,28 @@ export class RepoAnalyzerEngine {
   private isResultHandler(arg: any): arg is CodeWalkerResultHandler<any> {
     return typeof arg === 'function';
   }
+
+  private searchRecursive(dir: string, pattern: string) {
+    if (dir.endsWith('node_modules')) {
+      return [];
+    }
+
+    let results: string[] = [];
+  
+    fs.readdirSync(dir).forEach((dirInner) => {
+      dirInner = path.resolve(dir, dirInner);
+      const stat = fs.statSync(dirInner);
+      if (stat.isDirectory()) {
+        results = results.concat(this.searchRecursive(dirInner, pattern));
+      }
+
+      if (stat.isFile() && dirInner.endsWith(pattern)) {
+        results.push(dirInner);
+      }
+
+    });
+  
+    return results;
+  };
 }
+

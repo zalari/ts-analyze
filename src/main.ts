@@ -46,7 +46,7 @@ try {
 
       const analyzerInstance = loadAnalyzer(analyzerName, '.', searchPaths, options);
 
-      const engine = new RepoAnalyzerEngine(args.path as string, logger);
+      const engine = new RepoAnalyzerEngine(path.resolve(args.path as string), logger);
 
       const result = engine.run(analyzerInstance);
 
