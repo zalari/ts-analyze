@@ -10,6 +10,7 @@ import { RepoAnalyzerBase } from './classes/repo-analyzer-base.class';
 import { RepoAnalyzerEngine } from './classes/repo-analyzer-engine.class';
 import { RepoAnalyzerResultBase } from './classes/repo-analyzer-result-base.class';
 import { RepoAnalysisContext } from './classes/repo-analysis-context.class';
+import { RepoAnalyzerWithOptionsBase } from './classes/repo-analyzer-with-options-base.class';
 
 export {
   CodeAutoWalkerBase,
@@ -21,6 +22,7 @@ export {
   CodeWalkerResultHandler,
   CodeWalkerResultKind,
   RepoAnalyzerBase,
+  RepoAnalyzerWithOptionsBase,
   RepoAnalyzerEngine,
   RepoAnalyzerResultBase,
   RepoAnalysisContext

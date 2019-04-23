@@ -3,6 +3,7 @@ export {
     CodeWalkerBase,
     CodeWalkerDataResult,
     RepoAnalyzerBase,
+    RepoAnalyzerWithOptionsBase,
     CodeWalkerResultBase,
     RepoAnalyzerResultBase,
     RepoAnalysisContext
