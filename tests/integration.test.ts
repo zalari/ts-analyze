@@ -1,5 +1,6 @@
 import { RepoAnalyzerEngine } from '../src';
 import { TemplateAnalyzer } from '../analyzers/template-analyzer';
+import { SourceDiscoveryMode } from '../src/enums/source-discovery-mode.enum';
 
 const engine = new RepoAnalyzerEngine(process.cwd());
 
@@ -9,8 +10,8 @@ test('Sanity Check', () => {
   const classDirAnalyzer = new TemplateAnalyzer('/src/classes', ['.'], { decoratorName: 'Test' });
   const withSearchPathsAnalyzer = new TemplateAnalyzer('.', [ '/src/enums', '/src/classes' ], { decoratorName: 'Test' });
   
-  const multiResult = engine.run([enumsDirAnalyzer, classDirAnalyzer, withSearchPathsAnalyzer]);
-  const singleResult = engine.run(new TemplateAnalyzer('.', ['.'], { decoratorName: 'Test' }));
+  const multiResult = engine.run([enumsDirAnalyzer, classDirAnalyzer, withSearchPathsAnalyzer], { sourceDiscoveryMode: SourceDiscoveryMode.All, respectErrors: false });
+  const singleResult = engine.run(new TemplateAnalyzer('.', ['.'], { decoratorName: 'Test' }), { sourceDiscoveryMode: SourceDiscoveryMode.All, respectErrors: false });
 
   // No classes in enums directory
   expect(enumsDirAnalyzer.nameResults.length).toBe(0)

@@ -5,6 +5,8 @@ import winston from 'winston';
 import { Project } from 'ts-morph';
 import { SourceFile, CompilerOptions, ScriptTarget, ModuleKind, ModuleResolutionKind, DiagnosticCategory } from 'typescript';
 import { isArray } from 'util';
+import { SourceDiscoveryMode } from '../enums/source-discovery-mode.enum';
+import { RepoAnalyzerEngineRunOptions } from '../interfaces/repo-analyzer-engine-run-options.interface';
 
 /**
  * Engine for running repo analyzers.
@@ -26,9 +28,12 @@ export class RepoAnalyzerEngine {
     }
   }
 
-  run(analyzer: RepoAnalyzerBase<any>): RepoAnalyzerResultBase<any>
-  run(analyzers: RepoAnalyzerBase<any>[]): Map<RepoAnalyzerBase<any>, RepoAnalyzerResultBase<any>>
-  run(analyzerOrArray: RepoAnalyzerBase<any> | RepoAnalyzerBase<any>[]): RepoAnalyzerResultBase<any> | Map<RepoAnalyzerBase<any>, RepoAnalyzerResultBase<any>> {
+  run(analyzer: RepoAnalyzerBase<any>, options?: RepoAnalyzerEngineRunOptions): RepoAnalyzerResultBase<any>
+  run(analyzers: RepoAnalyzerBase<any>[], options?: RepoAnalyzerEngineRunOptions): Map<RepoAnalyzerBase<any>, RepoAnalyzerResultBase<any>>
+  run(analyzerOrArray: RepoAnalyzerBase<any> | RepoAnalyzerBase<any>[], options?: RepoAnalyzerEngineRunOptions): RepoAnalyzerResultBase<any> | Map<RepoAnalyzerBase<any>, RepoAnalyzerResultBase<any>> {
+    const respectErrors = options ? options.respectErrors : false;
+    const sourceDiscoveryMode = options ? options.sourceDiscoveryMode : SourceDiscoveryMode.TsConfig;
+
     let analyzers: RepoAnalyzerBase<any>[];
     
     if (!isArray(analyzerOrArray)) {
@@ -40,12 +45,12 @@ export class RepoAnalyzerEngine {
     const result: Map<RepoAnalyzerBase<any>, RepoAnalyzerResultBase<any>> = new Map();
 
     analyzers.forEach(analyzer => {
-      const context = new RepoAnalysisContext(this, analyzer, this._logger);
+      const compilationResult = this.compile(path.join(this._repoRootPath, analyzer.analysisRootPath), analyzer.analysisSearchPaths, sourceDiscoveryMode, respectErrors);
+      const context = new RepoAnalysisContext(this, analyzer, compilationResult.project.getLanguageService(), this._logger);
 
       analyzer.initialize(context);
-      const sourceFiles = this.getCompiledSources(path.join(this._repoRootPath, analyzer.analysisRootPath), analyzer.analysisSearchPaths);
-
-      sourceFiles.forEach(sourceFile => {
+     
+      compilationResult.files.forEach(sourceFile => {
         const walkersToHandlers = this._analyzersToWalkers.get(analyzer)!;
           walkersToHandlers.forEach((data, walker) => {
             const instance = new walker(sourceFile, 'walker', data.options);
@@ -92,13 +97,13 @@ export class RepoAnalyzerEngine {
     }
   }
   
-  private getCompiledSources(compilationRootPath: string, searchPaths: string[], respectErrors = false): SourceFile[] {
-    const project: Project = this.compileProject(compilationRootPath, searchPaths);
+  private compile(compilationRootPath: string, searchPaths: string[], sourceDiscoveryMode: SourceDiscoveryMode, respectErrors: boolean): { project: Project, files: SourceFile[] } {
+    const project: Project = this.compileProject(compilationRootPath, searchPaths, sourceDiscoveryMode, respectErrors);
 
-    return project.getSourceFiles().filter(f => !f.isInNodeModules()).map(sourceFile => sourceFile.compilerNode);
+    return { project, files: project.getSourceFiles().filter(f => !f.isInNodeModules()).map(sourceFile => sourceFile.compilerNode) };
   }
 
-  private compileProject(compilationRootPath: string, relativeSearchPaths: string[], respectErrors: boolean = false): Project {
+  private compileProject(compilationRootPath: string, relativeSearchPaths: string[], sourceDiscoveryMode: SourceDiscoveryMode, respectErrors: boolean): Project {
     const compilerOptions: CompilerOptions = {
       rootDir: compilationRootPath,
       target: ScriptTarget.ES5,
@@ -117,14 +122,18 @@ export class RepoAnalyzerEngine {
 
     relativeSearchPaths.forEach(searchPath => {
       const rootWithRelativePath = `${path.join(compilerOptions.rootDir!, searchPath)}`;
-      const tsConfigPaths = this.searchRecursive(rootWithRelativePath, 'tsconfig.json');
 
-      tsConfigPaths.forEach(p => {
-          this._logger.info(`Found tsconfig.json at ${p}. Adding to compilation`);
-          project.addSourceFilesFromTsConfig(p);
-        
-      })
+      if (sourceDiscoveryMode === SourceDiscoveryMode.TsConfig) {
+        const tsConfigPaths = this.searchRecursive(rootWithRelativePath, 'tsconfig.json');
 
+        tsConfigPaths.forEach(p => {
+            this._logger.info(`Found tsconfig.json at ${p}. Adding to compilation`);
+            project.addSourceFilesFromTsConfig(p);
+        })
+      } else if (sourceDiscoveryMode === SourceDiscoveryMode.All) {
+        const paths = this.searchRecursive(rootWithRelativePath, '.ts');
+        project.addExistingSourceFiles(paths);
+      }
       // Line below added searched node_modules as of ts-morph 2.0.1 which takes way too long.
       // project.addExistingSourceFiles(`${absoluteSearchPath}/**/*.ts`);
     });
