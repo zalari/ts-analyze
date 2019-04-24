@@ -1,5 +1,6 @@
 import { RepoAnalyzerEngine, CodeWalkerResultHandler, RepoAnalyzerBase } from '..';
 import * as winston from 'winston';
+import { LanguageService } from 'ts-morph';
 
 /**
  * Represents the hook for communicating the run-time intent of this analyzer to the analyzer engine.
@@ -8,7 +9,8 @@ export class RepoAnalysisContext {
   constructor(
     private _runner: RepoAnalyzerEngine,
     private _analyzer: RepoAnalyzerBase<any>,
-    private _logger: winston.Logger) { 
+    private _languageService: LanguageService,
+    private _logger: winston.Logger) {
   }
 
   /**
@@ -39,7 +41,11 @@ export class RepoAnalysisContext {
     this._runner.registerWalker(this._analyzer, walker, handlerOrOptions, options);
   }
 
-  log(message: string) {
+  log(message: string): void {
     this._logger.info(message);
+  }
+
+  get languageService(): LanguageService {
+    return this._languageService;
   }
 }
