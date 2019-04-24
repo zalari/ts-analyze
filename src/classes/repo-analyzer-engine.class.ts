@@ -60,10 +60,10 @@ export class RepoAnalyzerEngine {
             data.handlers.forEach(handler => {
               handler(walkerResults);
             });
-
-            result.set(analyzer, analyzer.getResult());
           });
         });
+
+        result.set(analyzer, analyzer.getResult());
       });
 
     if (result.size == 1) {
