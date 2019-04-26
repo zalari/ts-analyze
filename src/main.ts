@@ -31,6 +31,12 @@ try {
         describe: 'Allows passing search paths (relative to the root path) and options (as key value pairs) to pass to the parameter.'
       })
 
+      y.option('out',{
+        alias: 'o',
+        type: 'string',
+        describe: 'output analyzer result to file',
+      })
+
       return y;
     }, (args) => {
       const analyzerName = args.analyzer as string;
@@ -50,7 +56,12 @@ try {
 
       const result = engine.run(analyzerInstance);
 
-      console.log(result.asJson());
+      if (args.o) {
+        fs.writeFileSync(path.resolve(args.o as string), result, { mode: 'w'});
+      } else {
+        console.log(result.asJson());
+      }
+
     })
     .demandCommand(1, 'Please provide a command')
     .help()
