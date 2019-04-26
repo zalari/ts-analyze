@@ -1,6 +1,6 @@
 import { RepoAnalyzerEngine, CodeWalkerResultHandler, RepoAnalyzerBase } from '..';
 import * as winston from 'winston';
-import { LanguageService } from 'ts-morph';
+import { LanguageService, Project, Node } from 'ts-morph';
 
 /**
  * Represents the hook for communicating the run-time intent of this analyzer to the analyzer engine.
@@ -8,8 +8,8 @@ import { LanguageService } from 'ts-morph';
 export class RepoAnalysisContext {
   constructor(
     private _runner: RepoAnalyzerEngine,
+    private _project: Project,
     private _analyzer: RepoAnalyzerBase<any>,
-    private _languageService: LanguageService,
     private _logger: winston.Logger) {
   }
 
@@ -41,11 +41,29 @@ export class RepoAnalysisContext {
     this._runner.registerWalker(this._analyzer, walker, handlerOrOptions, options);
   }
 
-  log(message: string): void {
-    this._logger.info(message);
+  /**
+   * Gets the language service provided by ts-morph.
+   */
+  getLanguageService(): LanguageService {
+    return this._project.getLanguageService();
   }
 
-  get languageService(): LanguageService {
-    return this._languageService;
+  /**
+   * Provided a ts-morph node that is not attached to the project gets the respective attached node.
+   * @param unattachedNode 
+   */
+  getAttachedNode<T extends Node>(unattachedNode: T): T {
+    const sourceFile = this._project.getSourceFileOrThrow(unattachedNode.getSourceFile().getFilePath());
+    const child = sourceFile.getDescendantAtStartWithWidth( unattachedNode.getStart(), unattachedNode.getWidth());
+
+    return child as T;
+  }
+  
+  /**
+   * Write an info message to the current logger.
+   * @param message 
+   */
+  log(message: string): void {
+    this._logger.info(message);
   }
 }

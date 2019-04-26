@@ -46,7 +46,7 @@ export class RepoAnalyzerEngine {
 
     analyzers.forEach(analyzer => {
       const compilationResult = this.compile(path.join(this._repoRootPath, analyzer.analysisRootPath), analyzer.analysisSearchPaths, sourceDiscoveryMode, respectErrors);
-      const context = new RepoAnalysisContext(this, analyzer, compilationResult.project.getLanguageService(), this._logger);
+      const context = new RepoAnalysisContext(this, compilationResult.project, analyzer, this._logger);
 
       analyzer.initialize(context);
      
