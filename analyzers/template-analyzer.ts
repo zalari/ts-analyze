@@ -1,7 +1,8 @@
-import { RepoAnalyzerWithOptionsBase, CodeWalkerResultBase, RepoAnalysisContext, RepoAnalyzerResultBase, CodeWalkerDataResult } from '../src/api';
+import { CodeWalkerDataResult, CodeWalkerResultBase, RepoAnalyzerResultBase, RepoAnalyzerWithOptionsBase } from '../src/api';
 import { ClassNameCollector } from '../walkers/class-name-collector';
 import { DecoratorFinder } from '../walkers/decorator-finder';
 import { CodeWalkerNodeResult } from '../src/classes/code-walker-node-result.class';
+import { RepoAnalysisContext } from '../src/interfaces/repo-analysis-context.interface';
 
 interface TemplateAnalyzerResult {
   nameResults: CodeWalkerResultBase[];

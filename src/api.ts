@@ -6,5 +6,5 @@ export {
     RepoAnalyzerWithOptionsBase,
     CodeWalkerResultBase,
     RepoAnalyzerResultBase,
-    RepoAnalysisContext
+    RepoAnalysisContextImplementation
 } from './index';

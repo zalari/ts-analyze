@@ -1,4 +1,4 @@
-import { RepoAnalyzerBase, CodeWalkerResultHandler, RepoAnalysisContext, RepoAnalyzerResultBase } from '..';
+import { RepoAnalyzerBase, CodeWalkerResultHandler, RepoAnalysisContextImplementation, RepoAnalyzerResultBase, CodeWalkerImplementationInterface, CodeWalkerBase, CodeAutoWalkerBase } from '..';
 import fs from 'fs';
 import path from 'path';
 import winston from 'winston';
@@ -46,14 +46,22 @@ export class RepoAnalyzerEngine {
 
     analyzers.forEach(analyzer => {
       const compilationResult = this.compile(path.join(this._repoRootPath, analyzer.analysisRootPath), analyzer.analysisSearchPaths, sourceDiscoveryMode, respectErrors);
-      const context = new RepoAnalysisContext(this, compilationResult.project, analyzer, this._logger);
+      const context = new RepoAnalysisContextImplementation(this, compilationResult.project, analyzer, this._logger);
 
       analyzer.initialize(context);
      
       compilationResult.files.forEach(sourceFile => {
         const walkersToHandlers = this._analyzersToWalkers.get(analyzer)!;
           walkersToHandlers.forEach((data, walker) => {
-            const instance = new walker(sourceFile, 'walker', data.options);
+
+            let instance; 
+            if (walker.prototype instanceof CodeWalkerBase) {
+              instance = new walker(sourceFile, 'walker', data.options, context);
+            } else if (walker.prototype instanceof CodeAutoWalkerBase) {
+              const options = { ...data.options, ruleName: 'default', ruleArguments: [], ruleSeverity: 'off', disabledIntervals: [] }
+              instance = new walker(sourceFile, options, context);
+            }
+
             instance.walk(sourceFile);
             const walkerResults = instance.getResults();
             
@@ -186,5 +194,9 @@ export class RepoAnalyzerEngine {
   
     return results;
   };
+
+  private isManualWalker(arg: any): arg is CodeWalkerBase<any> {
+    return arg.walk !== undefined;
+  }
 }
 

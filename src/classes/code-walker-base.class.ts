@@ -1,7 +1,8 @@
-import { CodeWalkerResultBase, CodeWalkerImplementation, CodeWalkerImplementationInterface } from '..';
+import { CodeWalkerResultBase, CodeWalkerImplementation, CodeWalkerImplementationInterface, RepoAnalysisContextImplementation } from '..';
 import { CompilerNodeToWrappedType } from 'ts-morph';
 import { Fix, AbstractWalker} from 'tslint';
 import { Node, SourceFile, } from 'typescript';
+import { CodeWalkerNodeResult } from './code-walker-node-result.class';
 
 /**
  * Abstract base class for implementing manual code walkers.
@@ -9,8 +10,13 @@ import { Node, SourceFile, } from 'typescript';
  * Works by implementing the {@link walk} method.
  */
 export abstract class CodeWalkerBase<TOptions> extends AbstractWalker<TOptions> implements CodeWalkerImplementationInterface {
-  private readonly _implementation: CodeWalkerImplementation = new CodeWalkerImplementation();
+  private readonly _implementation: CodeWalkerImplementation;
   
+  constructor(sourceFile: SourceFile, ruleName: string, options: TOptions, context: RepoAnalysisContextImplementation) {
+    super(sourceFile, ruleName, options);
+    this._implementation = new CodeWalkerImplementation(context);
+  }
+
   /**
    * This method is called for every typscript file found during analysis. 
    * @param sourceFile The source file object as supplied by the TypesScript API.

@@ -1,4 +1,4 @@
-import { CodeWalkerResultBase, CodeWalkerImplementation, CodeWalkerImplementationInterface } from '..';
+import { CodeWalkerResultBase, CodeWalkerImplementation, CodeWalkerImplementationInterface, RepoAnalysisContextImplementation } from '..';
 import { CompilerNodeToWrappedType } from 'ts-morph';
 import { Fix, RuleFailure, IOptions, RuleWalker } from 'tslint';
 import { Node, SourceFile, } from 'typescript';
@@ -10,10 +10,11 @@ import { Node, SourceFile, } from 'typescript';
  * NOTE: For performance reasons you should prefer {@link CodeWalkerBase} if possible.
  */
 export abstract class CodeAutoWalkerBase extends RuleWalker implements CodeWalkerImplementationInterface {
-  private readonly implementation = new CodeWalkerImplementation();
+  private readonly _implementation: CodeWalkerImplementationInterface; 
 
-  constructor(sourceFile: SourceFile, options: IOptions = { ruleName: 'default', ruleArguments: [], ruleSeverity: 'off', disabledIntervals: [] }) {
+  constructor(sourceFile: SourceFile, options: IOptions = { ruleName: 'default', ruleArguments: [], ruleSeverity: 'off', disabledIntervals: [] }, context?: RepoAnalysisContextImplementation) {
     super(sourceFile, options);
+    this._implementation = new CodeWalkerImplementation(context);
   }
 
   /**
@@ -22,7 +23,7 @@ export abstract class CodeAutoWalkerBase extends RuleWalker implements CodeWalke
    * @param result
    */
   addResult(result: CodeWalkerResultBase): void {
-    this.implementation.addResult(result);
+    this._implementation.addResult(result);
   }
 
   /**
@@ -30,7 +31,7 @@ export abstract class CodeAutoWalkerBase extends RuleWalker implements CodeWalke
    * 
    */
   getResults(): CodeWalkerResultBase[] {
-    return this.implementation.getResults();
+    return this._implementation.getResults();
   }
 
    /**
@@ -40,7 +41,7 @@ export abstract class CodeAutoWalkerBase extends RuleWalker implements CodeWalke
    * 
    */
   wrap<T extends Node>(node: T): CompilerNodeToWrappedType<T> {
-    return this.implementation.wrap(node);
+    return this._implementation.wrap(node);
   }
 
   /**

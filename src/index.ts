@@ -9,7 +9,7 @@ import { CodeWalkerResultKind } from './enums/code-walker-result-kind.enum';
 import { RepoAnalyzerBase } from './classes/repo-analyzer-base.class';
 import { RepoAnalyzerEngine } from './classes/repo-analyzer-engine.class';
 import { RepoAnalyzerResultBase } from './classes/repo-analyzer-result-base.class';
-import { RepoAnalysisContext } from './classes/repo-analysis-context.class';
+import { RepoAnalysisContextImplementation } from './classes/repo-analysis-context-implementation.class';
 import { RepoAnalyzerWithOptionsBase } from './classes/repo-analyzer-with-options-base.class';
 
 export {
@@ -25,5 +25,5 @@ export {
   RepoAnalyzerWithOptionsBase,
   RepoAnalyzerEngine,
   RepoAnalyzerResultBase,
-  RepoAnalysisContext
+  RepoAnalysisContextImplementation
 };
