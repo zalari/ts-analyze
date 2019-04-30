@@ -1,5 +1,5 @@
 import { CodeWalkerResultBase, CodeWalkerImplementation, CodeWalkerImplementationInterface, RepoAnalysisContextImplementation } from '..';
-import { CompilerNodeToWrappedType } from 'ts-morph';
+import { CompilerNodeToWrappedType, Node as TsMorphNode } from 'ts-morph';
 import { Fix, AbstractWalker} from 'tslint';
 import { Node, SourceFile, } from 'typescript';
 import { CodeWalkerNodeResult } from './code-walker-node-result.class';
@@ -31,6 +31,10 @@ export abstract class CodeWalkerBase<TOptions> extends AbstractWalker<TOptions> 
    */
   addResult(result: CodeWalkerResultBase): void {
     this._implementation.addResult(result);
+  }
+
+  attach<T extends TsMorphNode>(unattachedNode: T): TsMorphNode {
+    return this._implementation.attach(unattachedNode);
   }
 
   /**

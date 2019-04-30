@@ -14,6 +14,10 @@ export class CodeWalkerImplementation implements CodeWalkerImplementationInterfa
     return tsMorph.createWrappedNode(node);
   }
 
+  attach<T extends tsMorph.Node>(unattachedNode: T): tsMorph.Node {
+    return this._context!.getAttachedNode(unattachedNode);
+  }
+
   addResult(result: CodeWalkerResultBase): void {
     if (this.isNodeResult(result) && this._context) {
       const attachedNode = this._context.getAttachedNode(result.data);

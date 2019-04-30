@@ -1,5 +1,5 @@
 import { CodeWalkerResultBase, CodeWalkerImplementation, CodeWalkerImplementationInterface, RepoAnalysisContextImplementation } from '..';
-import { CompilerNodeToWrappedType } from 'ts-morph';
+import { CompilerNodeToWrappedType, Node as TsMorphNode } from 'ts-morph';
 import { Fix, RuleFailure, IOptions, RuleWalker } from 'tslint';
 import { Node, SourceFile, } from 'typescript';
 
@@ -10,7 +10,7 @@ import { Node, SourceFile, } from 'typescript';
  * NOTE: For performance reasons you should prefer {@link CodeWalkerBase} if possible.
  */
 export abstract class CodeAutoWalkerBase extends RuleWalker implements CodeWalkerImplementationInterface {
-  private readonly _implementation: CodeWalkerImplementationInterface; 
+  private readonly _implementation: CodeWalkerImplementation; 
 
   constructor(sourceFile: SourceFile, options: IOptions = { ruleName: 'default', ruleArguments: [], ruleSeverity: 'off', disabledIntervals: [] }, context?: RepoAnalysisContextImplementation) {
     super(sourceFile, options);
@@ -24,6 +24,10 @@ export abstract class CodeAutoWalkerBase extends RuleWalker implements CodeWalke
    */
   addResult(result: CodeWalkerResultBase): void {
     this._implementation.addResult(result);
+  }
+
+  attach<T extends TsMorphNode>(unattachedNode: T): TsMorphNode {
+    return this._implementation.attach(unattachedNode);
   }
 
   /**
