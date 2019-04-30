@@ -1,4 +1,4 @@
-import { RepoAnalysisContextImplementation } from '..';
+import { RepoAnalysisContext } from '../interfaces/repo-analysis-context.interface';
 import { RepoAnalyzerResultBase } from './repo-analyzer-result-base.class';
 
 /**
@@ -23,7 +23,7 @@ export abstract class RepoAnalyzerBase<TResult> {
    * into an object returned by {@link getResult()}.
    * @param context 
    */
-  abstract initialize(context: RepoAnalysisContextImplementation): void;
+  abstract initialize(context: RepoAnalysisContext): void;
 
   /**
    * Returns the compiled result that this analyzer has generated after processing.
