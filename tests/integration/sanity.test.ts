@@ -1,6 +1,6 @@
-import { RepoAnalyzerEngine } from '../src';
-import { TemplateAnalyzer } from '../analyzers/template-analyzer';
-import { SourceDiscoveryMode } from '../src/enums/source-discovery-mode.enum';
+import { RepoAnalyzerEngine } from '../../src';
+import { TemplateAnalyzer } from '../../analyzers/template-analyzer';
+import { SourceDiscoveryMode } from '../../src/enums/source-discovery-mode.enum';
 
 const engine = new RepoAnalyzerEngine(process.cwd());
 
