@@ -2,8 +2,9 @@ import { CodeWalkerBase, CodeWalkerDataResult } from '../src';
 import { SourceFile } from 'typescript';
 import { CodeWalkerNodeResult } from '../src/classes/code-walker-node-result.class';
 import { Node } from 'ts-morph';
+import { WalkerOptions } from '../src/interfaces/walker-options.interface';
 
-export interface DecoratorFinderOptions {
+export interface DecoratorFinderOptions extends WalkerOptions {
     decoratorName: string | 'all';
     targets?: {
         classes?: boolean;

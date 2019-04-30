@@ -7,6 +7,7 @@ import { SourceFile, CompilerOptions, ScriptTarget, ModuleKind, ModuleResolution
 import { isArray } from 'util';
 import { SourceDiscoveryMode } from '../enums/source-discovery-mode.enum';
 import { RepoAnalyzerEngineRunOptions } from '../interfaces/repo-analyzer-engine-run-options.interface';
+import { WalkerOptions } from '../interfaces/walker-options.interface';
 
 /**
  * Engine for running repo analyzers.
@@ -56,7 +57,18 @@ export class RepoAnalyzerEngine {
 
             let instance; 
             if (walker.prototype instanceof CodeWalkerBase) {
-              instance = new walker(sourceFile, 'walker', data.options, context);
+
+              if (data.options && data.options.sourceFilePaths) {
+                const paths: string[] = data.options.sourceFilePaths;
+                
+                if (paths.indexOf(sourceFile.fileName) !== -1) {
+                  instance = new walker(sourceFile, 'walker', data.options, context);
+                }
+                
+              } else {
+                instance = new walker(sourceFile, 'walker', data.options, context);
+              }
+
             } else if (walker.prototype instanceof CodeAutoWalkerBase) {
               const options = { ...data.options, ruleName: 'default', ruleArguments: [], ruleSeverity: 'off', disabledIntervals: [] }
               instance = new walker(sourceFile, options, context);
@@ -82,7 +94,7 @@ export class RepoAnalyzerEngine {
   }
   
 
-  registerWalker<TWalker extends { new (...args: any[]): InstanceType<TWalker> } & { }, TOptions>(callingAnalyzer: RepoAnalyzerBase<any>, walker: TWalker, handlerOrOptions?: CodeWalkerResultHandler<any> | TOptions, options?: TOptions): void {
+  registerWalker<TWalker extends { new (...args: any[]): InstanceType<TWalker> } & { }, TOptions extends WalkerOptions>(callingAnalyzer: RepoAnalyzerBase<any>, walker: TWalker, handlerOrOptions?: CodeWalkerResultHandler<any> | TOptions, options?: TOptions): void {
     if (!this._analyzersToWalkers.has(callingAnalyzer)) {
       !this._analyzersToWalkers.set(callingAnalyzer, new Map());
     }
