@@ -14,10 +14,10 @@ import { WalkerOptions } from '../interfaces/walker-options.interface';
  */
 export class RepoAnalyzerEngine {
   private readonly _logger!: winston.Logger;
-  private readonly _analyzersToWalkers:  Map<RepoAnalyzerBase<any>, Map<any, { handlers: CodeWalkerResultHandler<any>[], options?: any } >>;  
+  private readonly _analyzersToWalkers:  Map<RepoAnalyzerBase<any>, Map<any, { handler?: CodeWalkerResultHandler<any>, options?: any }[]>>;  
 
   constructor(private _repoRootPath: string, logger?: winston.Logger) {
-    this._analyzersToWalkers = new Map<RepoAnalyzerBase<any>, Map<any, { handlers: CodeWalkerResultHandler<any>[], options?: any }>>();
+    this._analyzersToWalkers = new Map<RepoAnalyzerBase<any>, Map<any, { handler?: CodeWalkerResultHandler<any>, options?: any }[]>>();
     this._logger = logger!;
 
     if (!this._logger) {
@@ -53,33 +53,44 @@ export class RepoAnalyzerEngine {
      
       compilationResult.files.forEach(sourceFile => {
         const walkersToHandlers = this._analyzersToWalkers.get(analyzer)!;
-          walkersToHandlers.forEach((data, walker) => {
+          walkersToHandlers.forEach((handlersWithOptions, walkerType) => {
 
-            let instance; 
-            if (walker.prototype instanceof CodeWalkerBase) {
+            if (walkerType.prototype instanceof CodeWalkerBase) {
 
-              if (data.options && data.options.sourceFilePaths) {
-                const paths: string[] = data.options.sourceFilePaths;
-                
-                if (paths.indexOf(sourceFile.fileName) !== -1) {
-                  instance = new walker(sourceFile, 'walker', data.options, context);
+              handlersWithOptions.forEach(handlerWithOptions => {
+                let walkerInstance; 
+
+                if (handlerWithOptions.options && handlerWithOptions.options.sourceFilePaths) {
+                  const paths: string[] = handlerWithOptions.options.sourceFilePaths;
+                  
+                  if (paths.indexOf(sourceFile.fileName) !== -1) {
+                    walkerInstance = new walkerType(sourceFile, 'walker', handlerWithOptions.options, context);
+                  }
+                  
+                } else {
+                  walkerInstance = new walkerType(sourceFile, 'walker', handlerWithOptions.options, context);
                 }
-                
-              } else {
-                instance = new walker(sourceFile, 'walker', data.options, context);
-              }
 
-            } else if (walker.prototype instanceof CodeAutoWalkerBase) {
-              const options = { ...data.options, ruleName: 'default', ruleArguments: [], ruleSeverity: 'off', disabledIntervals: [] }
-              instance = new walker(sourceFile, options, context);
+                walkerInstance.walk(sourceFile);
+             
+                if (handlerWithOptions.handler) {
+                  const walkerResults = walkerInstance.getResults();
+                  handlerWithOptions.handler(walkerResults);
+                }
+              });
+
+            } else if (walkerType.prototype instanceof CodeAutoWalkerBase) {
+              handlersWithOptions.forEach(handlerWithOptions => {
+                const options = { ...handlerWithOptions.options, ruleName: 'default', ruleArguments: [], ruleSeverity: 'off', disabledIntervals: [] }
+                const walkerInstance = new walkerType(sourceFile, options, context);
+                walkerInstance.walk(sourceFile);
+              
+                if (handlerWithOptions.handler) {
+                  const walkerResults = walkerInstance.getResults();
+                  handlerWithOptions.handler(walkerResults);
+                }
+              });
             }
-
-            instance.walk(sourceFile);
-            const walkerResults = instance.getResults();
-            
-            data.handlers.forEach(handler => {
-              handler(walkerResults);
-            });
           });
         });
 
@@ -93,7 +104,6 @@ export class RepoAnalyzerEngine {
     return result;
   }
   
-
   registerWalker<TWalker extends { new (...args: any[]): InstanceType<TWalker> } & { }, TOptions extends WalkerOptions>(callingAnalyzer: RepoAnalyzerBase<any>, walker: TWalker, handlerOrOptions?: CodeWalkerResultHandler<any> | TOptions, options?: TOptions): void {
     if (!this._analyzersToWalkers.has(callingAnalyzer)) {
       !this._analyzersToWalkers.set(callingAnalyzer, new Map());
@@ -109,12 +119,10 @@ export class RepoAnalyzerEngine {
     }
     
     if (!this._analyzersToWalkers.get(callingAnalyzer)!.has(walker)) {
-      this._analyzersToWalkers.get(callingAnalyzer)!.set(walker, { handlers: [], options });
+      this._analyzersToWalkers.get(callingAnalyzer)!.set(walker, []);
     }
  
-    if (handler) {
-      this._analyzersToWalkers.get(callingAnalyzer)!.get(walker)!.handlers.push(handler);
-    }
+    this._analyzersToWalkers.get(callingAnalyzer)!.get(walker)!.push({ handler, options });
   }
   
   private compile(compilationRootPath: string, searchPaths: string[], sourceDiscoveryMode: SourceDiscoveryMode, respectErrors: boolean): { project: Project, files: SourceFile[] } {
@@ -211,4 +219,3 @@ export class RepoAnalyzerEngine {
     return arg.walk !== undefined;
   }
 }
-
