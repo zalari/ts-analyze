@@ -25,32 +25,29 @@ export abstract class CodeWalkerBase<TOptions> extends AbstractWalker<TOptions> 
   abstract walk(sourceFile: SourceFile): void;
 
   /**
-   * Adds a result that can be used by an analyzer.
-   * 
-   * @param result
+   * @inheritdoc
    */
   addResult(result: CodeWalkerResultBase): void {
     this._implementation.addResult(result);
   }
 
+  /**
+   * @inheritdoc
+   */
   attach<T extends TsMorphNode>(unattachedNode: T): TsMorphNode {
     return this._implementation.attach(unattachedNode);
   }
 
-  /**
-   * Returns all added results.
-   * 
+    /**
+   * @inheritdoc
    */
   getResults(): CodeWalkerResultBase[] {
     return this._implementation.getResults();
   }
 
   /**
-   * Converts an a TypeScript-API-based AST node to its ts-morph-based equivalent.
-   * 
-   * @param node The node to convert.
-   * 
-   */
+  * @inheritdoc
+  */
   wrap<T extends Node>(node: T): CompilerNodeToWrappedType<T> {
     return this._implementation.wrap(node);
   }
