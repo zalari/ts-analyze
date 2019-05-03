@@ -3,6 +3,7 @@ import { CompilerNodeToWrappedType, Node as TsMorphNode } from 'ts-morph';
 import { Fix, AbstractWalker} from 'tslint';
 import { Node, SourceFile, } from 'typescript';
 import { CodeWalkerNodeResult } from './code-walker-node-result.class';
+import { WalkerLanguageService } from './walker-language-service.class';
 
 /**
  * Abstract base class for implementing manual code walkers.
@@ -11,12 +12,19 @@ import { CodeWalkerNodeResult } from './code-walker-node-result.class';
  */
 export abstract class CodeWalkerBase<TOptions> extends AbstractWalker<TOptions> implements CodeWalkerImplementationInterface {
   private readonly _implementation: CodeWalkerImplementation;
-  
+
   constructor(sourceFile: SourceFile, ruleName: string, options: TOptions, context: RepoAnalysisContextImplementation) {
     super(sourceFile, ruleName, options);
     this._implementation = new CodeWalkerImplementation(context);
   }
 
+  /**
+   * @inheritdoc
+   */
+  get languageService(): WalkerLanguageService {
+    return this._implementation.languageService;
+  }
+ 
   /**
    * This method is called for every typscript file found during analysis. 
    * @param sourceFile The source file object as supplied by the TypesScript API.

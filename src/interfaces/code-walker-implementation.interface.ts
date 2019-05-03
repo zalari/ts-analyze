@@ -2,6 +2,7 @@ import * as ts from 'typescript';
 import * as tsMorph from 'ts-morph';
 import { CodeWalkerResultBase } from '..';
 import { CodeWalkerNodeResult } from '../classes/code-walker-node-result.class';
+import { WalkerLanguageService } from '../classes/walker-language-service.class';
 
 export interface CodeWalkerImplementationInterface {
 
@@ -33,4 +34,9 @@ export interface CodeWalkerImplementationInterface {
    * Returns all added results.
    */
   getResults(): CodeWalkerResultBase[];
+
+  /**
+   * Returns the language service that contains various utility functions.
+   */
+  languageService: WalkerLanguageService;
 }

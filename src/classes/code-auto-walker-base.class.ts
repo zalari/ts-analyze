@@ -2,6 +2,7 @@ import { CodeWalkerResultBase, CodeWalkerImplementation, CodeWalkerImplementatio
 import { CompilerNodeToWrappedType, Node as TsMorphNode } from 'ts-morph';
 import { Fix, RuleFailure, IOptions, RuleWalker } from 'tslint';
 import { Node, SourceFile, } from 'typescript';
+import { WalkerLanguageService } from './walker-language-service.class';
 
 /**
  * Abstract base class for implementing automatic code walkers.
@@ -10,11 +11,18 @@ import { Node, SourceFile, } from 'typescript';
  * NOTE: For performance reasons you should prefer {@link CodeWalkerBase} if possible.
  */
 export abstract class CodeAutoWalkerBase extends RuleWalker implements CodeWalkerImplementationInterface {
-  private readonly _implementation: CodeWalkerImplementation; 
+  private readonly _implementation: CodeWalkerImplementation;
 
   constructor(sourceFile: SourceFile, options: IOptions = { ruleName: 'default', ruleArguments: [], ruleSeverity: 'off', disabledIntervals: [] }, context?: RepoAnalysisContextImplementation) {
     super(sourceFile, options);
     this._implementation = new CodeWalkerImplementation(context);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  get languageService(): WalkerLanguageService {
+    return this._implementation.languageService;
   }
 
   /**

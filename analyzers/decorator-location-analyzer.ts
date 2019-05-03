@@ -34,7 +34,7 @@ export class DecoratorLocationAnalyzer extends RepoAnalyzerWithOptionsBase<Decor
 
     this.decoratedNodes.forEach(node => {
         const packageJson = this.findPackageJson(node.getSourceFile().getFilePath());
-        
+
         if (packageJson) {
             locations.push({ package: packageJson.name, path: node.getSourceFile().getFilePath() })
         }

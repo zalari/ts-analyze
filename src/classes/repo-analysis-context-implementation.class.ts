@@ -45,19 +45,8 @@ export class RepoAnalysisContextImplementation implements RepoAnalysisContext {
   /**
    * Gets the language service provided by ts-morph.
    */
-  getLanguageService(): LanguageService {
-    return this._project.getLanguageService();
-  }
-
-  /**
-   * Provided a ts-morph node that is not attached to the project gets the respective attached node.
-   * @param unattachedNode 
-   */
-  getAttachedNode<T extends Node>(unattachedNode: T): T {
-    const sourceFile = this._project.getSourceFileOrThrow(unattachedNode.getSourceFile().getFilePath());
-    const child = sourceFile.getDescendantAtStartWithWidth( unattachedNode.getStart(), unattachedNode.getWidth());
-
-    return child as T;
+  get project(): Project {
+    return this._project;
   }
 
   /**

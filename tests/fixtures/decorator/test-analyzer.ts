@@ -13,13 +13,13 @@ export class TestAnalyzer extends RepoAnalyzerBase<any> {
     options.decoratorName = 'TestDecorator';
 
     context.registerWalker(DecoratorFinder, (results: CodeWalkerNodeResult[]) => this.handleDecoratorResults(results), options);
-    context.registerWalker(PropertyAccessFinder, (results) => this.handleMethodResults(results), {  targets: [ { kind: 'method', propertyName: 'doWithTypeAsArgument' } ] } as PropertyAccessFinderOptions);
+    context.registerWalker(PropertyAccessFinder, (results) => this.handleMethodResults(results), { kind: 'method', propertyName: 'doWithTypeAsArgument', typeName: 'ExternalClass' } as PropertyAccessFinderOptions);
   }
 
   handleMethodResults(results: PropertyAccessFinderResult[]): void {
 
     results.forEach(result => {
-      result.data.propertyAccesssExpression.getParentIfKindOrThrow(SyntaxKind.CallExpression).getArguments().forEach(arg => {
+      result.data.expression.getParentIfKindOrThrow(SyntaxKind.CallExpression).getArguments().forEach(arg => {
         const className = arg.getSymbolOrThrow().getEscapedName();
 
         if (this._messageNameToNode.has(className)) {

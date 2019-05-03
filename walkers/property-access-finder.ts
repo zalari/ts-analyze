@@ -1,11 +1,10 @@
 import { CodeWalkerBase, CodeWalkerDataResult, CodeWalkerResultBase } from '../src';
 import { SourceFile, SyntaxKind } from 'typescript';
 import { CodeWalkerNodeResult } from '../src/classes/code-walker-node-result.class';
-import { PropertyAccessExpression } from 'ts-morph';
+import { PropertyAccessExpression, MethodDeclaration, ClassDeclaration, InterfaceDeclaration, Symbol, Node } from 'ts-morph';
 import { WalkerOptions } from '../src/interfaces/walker-options.interface';
 
-export interface PropertyAccessFinderOptions extends WalkerOptions {
-    targets: PropertyAccessFinderTarget[];
+export interface PropertyAccessFinderOptions extends PropertyAccessFinderTarget {
 }
 
 export class PropertyAccessFinderResult extends CodeWalkerDataResult<PropertyAccessFinderResultData> {
@@ -13,7 +12,7 @@ export class PropertyAccessFinderResult extends CodeWalkerDataResult<PropertyAcc
 }
 
 interface PropertyAccessFinderResultData extends PropertyAccessFinderTarget {
-    propertyAccesssExpression: PropertyAccessExpression;
+    expression: PropertyAccessExpression;
 }
 
 interface PropertyAccessFinderTarget {
@@ -26,23 +25,34 @@ export class PropertyAccessFinder extends CodeWalkerBase<PropertyAccessFinderOpt
 
     walk(sourceFile: SourceFile): void {
         const file = this.wrap(sourceFile);
-        const options = this.options;
 
         file.getDescendantsOfKind(SyntaxKind.PropertyAccessExpression).forEach(propertyAccess => {
-            const propertyAccessAttached = this.attach(propertyAccess);
-            const propertySymbol = propertyAccessAttached.getSymbolOrThrow();
+            const propertySymbol = this.languageService.getSymbolSafe(propertyAccess);
+            let propertyName;
 
-            this.options.targets.forEach(target => {
-                if (target.kind === 'method') {
-                    const callExpressionParent = propertyAccessAttached.getParentIfKind(SyntaxKind.CallExpression);
+            if (propertySymbol) {
+                propertyName = propertySymbol.getEscapedName();
 
-                    if (callExpressionParent) {
-                        if (propertySymbol.getEscapedName() === target.propertyName) {
-                            this.addResult(new PropertyAccessFinderResult({...target, propertyAccesssExpression: propertyAccessAttached as PropertyAccessExpression}));
-                        }
+            } else {
+                // Attempt to find name based solely on syntax if symbol can not be found
+                const identifier = propertyAccess.getLastChildByKind(SyntaxKind.Identifier);
+
+                if (identifier) {
+                    propertyName = identifier.getText();
+                }
+            }
+
+            if (this.options.kind === 'method') {
+                const callExpressionParent = propertyAccess.getParentIfKind(SyntaxKind.CallExpression);
+
+                if (callExpressionParent) {
+                    //const declaringSymbol = this.getDeclaringSymbol(propertySymbol);
+                    // declaringSymbol && declaringSymbol.getName() === this.options.typeName && 
+                    if (propertyName === this.options.propertyName) {
+                        this.addResult(new PropertyAccessFinderResult({ ...this.options, expression: this.languageService.attach(propertyAccess) as PropertyAccessExpression }));
                     }
                 }
-            });
+            }
 
         });
     }
