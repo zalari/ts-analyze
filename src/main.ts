@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import { RepoAnalyzerEngine } from './classes/repo-analyzer-engine.class';
-import { pascalCase } from 'change-case';
+import { pascalCase, camelCase } from 'change-case';
 
 const logger = winston.createLogger({
   transports: [
@@ -90,7 +90,7 @@ function parseSearchPathsAndOptions(rawStrings: string[]): { options: object, se
     rawStrings.forEach(s => {
       const [key, value] = s.split('=');
       if (key && value) {      
-       options[key] = value;
+       options[camelCase(key)] = value;
       } else {
         searchPaths.push(s);
       }
