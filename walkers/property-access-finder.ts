@@ -52,8 +52,16 @@ export class PropertyAccessFinder extends CodeWalkerBase<PropertyAccessFinderOpt
                         this.addResult(new PropertyAccessFinderResult({ ...this.options, expression: this.languageService.attach(propertyAccess) as PropertyAccessExpression }));
                     }
                 }
-            }
+            } else if (this.options.kind === 'property') {
+                const expressionStatementParent = propertyAccess.getParentIfKind(SyntaxKind.ExpressionStatement);
 
+                if (expressionStatementParent) {
+                    if (propertyName === this.options.propertyName) {
+                        this.addResult(new PropertyAccessFinderResult({ ...this.options, expression: this.languageService.attach(propertyAccess) as PropertyAccessExpression }));
+                    }
+                }
+
+            }
         });
     }
 }

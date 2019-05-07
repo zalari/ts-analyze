@@ -12,7 +12,6 @@ interface FunctionCallFinderTarget {
     functionName: string;
 }
 
-
 interface FunctionCallFinderResultData extends FunctionCallFinderTarget {
     expression: CallExpression;
 }

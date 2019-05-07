@@ -13,7 +13,7 @@ import { WalkerLanguageService } from './walker-language-service.class';
 export abstract class CodeWalkerBase<TOptions> extends AbstractWalker<TOptions> implements CodeWalkerImplementationInterface {
   private readonly _implementation: CodeWalkerImplementation;
 
-  constructor(sourceFile: SourceFile, ruleName: string, options: TOptions, context: RepoAnalysisContextImplementation) {
+  constructor(sourceFile: SourceFile, ruleName: string, options: TOptions, context?: RepoAnalysisContextImplementation) {
     super(sourceFile, ruleName, options);
     this._implementation = new CodeWalkerImplementation(context);
   }
