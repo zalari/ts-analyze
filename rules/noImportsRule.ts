@@ -1,9 +1,22 @@
-import * as Lint from 'tslint';
-import * as ts from 'typescript';
-import { NoImportsWalker } from '../walkers/no-imports-walker';
+import * as Lint from "tslint";
+import * as ts from "typescript";
+import { CodeAutoWalkerBase } from "../src";
 
-export class NoImportsRule extends Lint.Rules.AbstractRule {
+export class Rule extends Lint.Rules.AbstractRule {
+    public static FAILURE_STRING = "import statement forbidden";
+
     public apply(sourceFile: ts.SourceFile): Lint.RuleFailure[] {
         return this.applyWithWalker(new NoImportsWalker(sourceFile, this.getOptions()));
+    }
+}
+
+// The walker takes care of all the work.
+class NoImportsWalker extends CodeAutoWalkerBase {
+    public visitImportDeclaration(node: ts.ImportDeclaration) {
+        // create a failure at the current position
+        this.addFailure(this.createFailure(node.getStart(), node.getWidth(), Rule.FAILURE_STRING));
+
+        // call the base version of this visitor to actually parse this node
+        super.visitImportDeclaration(node);
     }
 }
