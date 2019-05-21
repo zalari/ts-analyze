@@ -1,12 +1,7 @@
-import { RepoAnalyzerWithOptionsBase, RepoAnalysisContext, RepoAnalyzerResultBase } from "../src/api";
+import { RepoAnalyzerWithOptionsBase, RepoAnalysisContext, RepoAnalyzerResultBase, FileSystemUtils } from "../src/api";
 import { DecoratorFinder } from "../walkers/decorator-finder";
 import { CodeWalkerNodeResult } from "../src/classes/code-walker-node-result.class";
 import { Node } from "ts-morph";
-
-import fs from 'fs';
-import path from 'path';
-import os from 'os';
-
 
 interface DecoratorLocationAnalyzerResult {
     locations: {
@@ -33,7 +28,7 @@ export class DecoratorLocationAnalyzer extends RepoAnalyzerWithOptionsBase<Decor
     const locations: { package: string, path: string}[] = [];
 
     this.decoratedNodes.forEach(node => {
-        const packageJson = this.findPackageJson(node.getSourceFile().getFilePath());
+        const packageJson = FileSystemUtils.findPackageJsonForFile(node.getSourceFile().getFilePath());
 
         if (packageJson) {
             locations.push({ package: packageJson.name, path: node.getSourceFile().getFilePath() })
@@ -42,22 +37,5 @@ export class DecoratorLocationAnalyzer extends RepoAnalyzerWithOptionsBase<Decor
 
     return new RepoAnalyzerResultBase({locations});
 
-  }
-
-  private findPackageJson(filePath: string): any | null {
-    let currentDir = path.dirname(filePath).toLowerCase();
-    var fsRoot = (os.platform() === "win32") ? process.cwd().split(path.sep)[0] + '/' : "/"
-
-    while (currentDir !== fsRoot) {
-        const directoryContents = fs.readdirSync(currentDir);
-
-        if (directoryContents.includes('package.json')) {
-            return JSON.parse(fs.readFileSync(path.join(currentDir, 'package.json'), { encoding: 'utf8'}));
-        }
-
-        currentDir = path.join(currentDir, '..');
-    }   
-
-    return null;
   }
 }
