@@ -18,46 +18,42 @@ const logger = winston.createLogger({
 
 try {
   yargs
-    .command('run-analyzer [analyzer] [path] [searchPathsAndOptions..]', 'runs an analyzer on the provided path', (y) => {
-      y.positional('analyzer', {
-        describe: 'analyzer to run'
-      });
-
-      y.positional('path', {
-        describe: 'root path to run analyzer on'
-      });
-
-      y.positional('searchPathsAndOptions', {
-        describe: 'Allows passing search paths (relative to the root path) and options (as key value pairs) to pass to the parameter.'
-      })
-
-      y.option('out',{
-        alias: 'o',
-        type: 'string',
-        describe: 'output analyzer result to file',
-      })
-
-      return y;
+    .command('run-analyzer <analyzer> <path>', 'runs an analyzer on the provided path', (y) => {
+      return y
+        .positional('analyzer', {
+          type: 'string',
+          describe: 'analyzer to run'
+        })
+        .positional('path', {
+          type: 'string',
+          describe: 'root path to run analyzer on'
+        })
+        .option('options', {
+          type: 'array',
+          describe: 'options as key:value pairs to be send to the analyzer',
+        })
+        .option('sub-paths', {
+          type: 'array',
+          describe: 'relative (to root path) to apply the analyzer on',
+        })
+        .option('json', {
+          type: 'string',
+          describe: 'output analyzer result to specified json file',
+        })
     }, (args) => {
       const analyzerName = args.analyzer as string;
-      const searchPathsAndOptions = parseSearchPathsAndOptions(args.searchPathsAndOptions as string[])
-
-      let searchPaths;
-      let options;
-
-      if (searchPathsAndOptions) {
-        searchPaths = searchPathsAndOptions.searchPaths;
-        options = searchPathsAndOptions.options;        
-      }
-
+      const rootPath = args.path;
+      const options = parseOptions(args.options as string[])
+      const searchPaths = args.subPaths;
+  
       const analyzerInstance = loadAnalyzer(analyzerName, '.', searchPaths, options);
 
-      const engine = new RepoAnalyzerEngine(path.resolve(args.path as string), logger);
+      const engine = new RepoAnalyzerEngine(path.resolve(rootPath as string), logger);
 
       const result = engine.run(analyzerInstance);
 
-      if (args.o) {
-        fs.writeFileSync(path.resolve(args.o as string), result, { mode: 'w'});
+      if (args.json) {
+        fs.writeFileSync(path.resolve(args.json as string), result.asJson());
       } else {
         console.log(result.asJson());
       }
@@ -74,7 +70,7 @@ try {
 
 process.exit(0);
 
-function parseSearchPathsAndOptions(rawStrings: string[]): { options: object, searchPaths: string[] } | undefined {
+function parseOptions(rawStrings: string[]): object | undefined {
   if (!rawStrings) {
     return undefined;
   }
@@ -84,26 +80,19 @@ function parseSearchPathsAndOptions(rawStrings: string[]): { options: object, se
   }
 
   const options = Object.create(null);
-  const searchPaths: string[] = [];
-  
+
   try {
     rawStrings.forEach(s => {
       const [key, value] = s.split('=');
-      if (key && value) {      
-       options[camelCase(key)] = value;
-      } else {
-        searchPaths.push(s);
+      if (key && value) {
+        options[camelCase(key)] = value;
       }
     });
   } catch {
-    throw new Error('Invalid options/searchPaths supplied');
+    throw new Error('Invalid options supplied');
   }
 
-  if (searchPaths.length === 0) {
-    searchPaths.push('.');
-  }
-
-  return { options, searchPaths };
+  return options;
 }
 
 function loadAnalyzer(name: string, ...args: any[]): any {
