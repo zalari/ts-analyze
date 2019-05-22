@@ -1,11 +1,9 @@
-import { getStubsForWalker } from '../test-util';
+import { TestUtil } from '../test-util';
 import { PropertyAccessFinder } from '../../walkers/property-access-finder';
-import { readFileSync } from 'fs';
-import * as path from 'path';
 
 test('Sanity Check', () => {
-    const code = readFileSync(path.join(process.cwd(), 'tests/fixtures/decorator/fixture.ts'), { encoding: 'utf8' });
-    const { sourceFile, context } = getStubsForWalker(code);
+    const code = TestUtil.getCodeForFixture("fixture-1");
+    const { sourceFile, context } = TestUtil.getStubsForWalker(code);
 
     const finder = new PropertyAccessFinder(sourceFile, '', { kind: "method",  typeName: '', propertyName: 'doWithTypeAsArgument' }, context);
     finder.walk(sourceFile);
