@@ -1,4 +1,4 @@
-import { RepoAnalyzerBase, CodeWalkerResultHandler, RepoAnalysisContextImplementation, RepoAnalyzerResultBase, CodeWalkerImplementationInterface, CodeWalkerBase, CodeAutoWalkerBase } from '..';
+import { RepoAnalyzerBase, CodeWalkerResultHandler, RepoAnalysisContextImplementation, RepoAnalyzerResultBase, CodeWalkerImplementationInterface, CodeWalkerBase, CodeAutoWalkerBase, CodeWalkerResultBase } from '..';
 import fs from 'fs';
 import path from 'path';
 import winston from 'winston';
@@ -104,18 +104,9 @@ export class RepoAnalyzerEngine {
     return result;
   }
   
-  registerWalker<TWalker extends { new (...args: any[]): InstanceType<TWalker> } & { }, TOptions extends WalkerOptions>(callingAnalyzer: RepoAnalyzerBase<any>, walker: TWalker, handlerOrOptions?: CodeWalkerResultHandler<any> | TOptions, options?: TOptions): void {
+  registerWalker<TWalker extends { new (...args: any[]): InstanceType<TWalker> } & { }, TWalkerResult extends CodeWalkerResultBase, TWalkerOptions extends WalkerOptions>(callingAnalyzer: RepoAnalyzerBase<any>, walker: TWalker, handler: CodeWalkerResultHandler<TWalkerResult>, options?: TWalkerOptions): void {
     if (!this._analyzersToWalkers.has(callingAnalyzer)) {
       !this._analyzersToWalkers.set(callingAnalyzer, new Map());
-    }
-
-    let handler;
-
-    if (this.isResultHandler(handlerOrOptions)) {
-      handler = handlerOrOptions;
-      options = options;
-    } else {
-      options = handlerOrOptions;
     }
     
     if (!this._analyzersToWalkers.get(callingAnalyzer)!.has(walker)) {
@@ -187,11 +178,7 @@ export class RepoAnalyzerEngine {
 
     return project;
   }
-
-  private isResultHandler(arg: any): arg is CodeWalkerResultHandler<any> {
-    return typeof arg === 'function';
-  }
-
+  
   private searchRecursive(dir: string, pattern: string) {
     if (dir.endsWith('node_modules')) {
       return [];
@@ -214,8 +201,4 @@ export class RepoAnalyzerEngine {
   
     return results;
   };
-
-  private isManualWalker(arg: any): arg is CodeWalkerBase<any> {
-    return arg.walk !== undefined;
-  }
 }

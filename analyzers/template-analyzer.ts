@@ -19,7 +19,6 @@ export class TemplateAnalyzer extends RepoAnalyzerWithOptionsBase<TemplateAnalyz
   public decoratorResults: CodeWalkerResultBase[] = [];
 
   initialize(context: RepoAnalysisContext): void {
-    // TODO: Mechanism/Typings to allow for automatic specific subtype that the handler will receive
     context.registerWalker(ClassNameCollector, (results: CodeWalkerResultBase[]) => this.handleClassNameResults(results));
 
     const options = DecoratorFinder.getDefaultOptions();
