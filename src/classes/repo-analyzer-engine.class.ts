@@ -2,22 +2,26 @@ import { RepoAnalyzerBase, CodeWalkerResultHandler, RepoAnalysisContextImplement
 import fs from 'fs';
 import path from 'path';
 import winston from 'winston';
-import { Project } from 'ts-morph';
+import { Project, SourceFile as SourceFileTsMorph  } from 'ts-morph';
 import { SourceFile, CompilerOptions, ScriptTarget, ModuleKind, ModuleResolutionKind, DiagnosticCategory } from 'typescript';
 import { isArray } from 'util';
 import { SourceDiscoveryMode } from '../enums/source-discovery-mode.enum';
 import { RepoAnalyzerEngineRunOptions } from '../interfaces/repo-analyzer-engine-run-options.interface';
 import { WalkerOptions } from '../interfaces/walker-options.interface';
+import { SourceFileHandler } from '../types/source-file-handler.type';
 
 /**
  * Engine for running repo analyzers.
  */
 export class RepoAnalyzerEngine {
   private readonly _logger!: winston.Logger;
-  private readonly _analyzersToWalkers:  Map<RepoAnalyzerBase<any>, Map<any, { handler?: CodeWalkerResultHandler<any>, options?: any }[]>>;  
+  private readonly _analyzersToWalkers: Map<RepoAnalyzerBase<any>, Map<any, { handler: CodeWalkerResultHandler<any>, options?: any }[]>>;  
+  private readonly _analyzersToHandlers: Map<RepoAnalyzerBase<any>, SourceFileHandler[]>;
 
   constructor(private _repoRootPath: string, logger?: winston.Logger) {
-    this._analyzersToWalkers = new Map<RepoAnalyzerBase<any>, Map<any, { handler?: CodeWalkerResultHandler<any>, options?: any }[]>>();
+    this._analyzersToWalkers = new Map<RepoAnalyzerBase<any>, Map<any, { handler: CodeWalkerResultHandler<any>, options?: any }[]>>();
+    this._analyzersToHandlers = new Map<RepoAnalyzerBase<any>, SourceFileHandler[]>();
+    
     this._logger = logger!;
 
     if (!this._logger) {
@@ -51,7 +55,11 @@ export class RepoAnalyzerEngine {
 
       analyzer.initialize(context);
      
-      compilationResult.files.forEach(sourceFile => {
+      compilationResult.files.forEach(sourceFileTsMorph => {
+        this.runIndependentHandlers(analyzer, sourceFileTsMorph);
+
+        const sourceFile = sourceFileTsMorph.compilerNode;
+
         const walkersToHandlers = this._analyzersToWalkers.get(analyzer)!;
           walkersToHandlers.forEach((handlersWithOptions, walkerType) => {
 
@@ -103,8 +111,16 @@ export class RepoAnalyzerEngine {
 
     return result;
   }
+
+  registerIndependentHandler(callingAnalyzer: RepoAnalyzerBase<any>, handler: SourceFileHandler) {
+    if (!this._analyzersToHandlers.has(callingAnalyzer)) {
+      this._analyzersToHandlers.set(callingAnalyzer, []);
+    }
+
+    this._analyzersToHandlers.get(callingAnalyzer)!.push(handler);
+  }
   
-  registerWalker<TWalker extends { new (...args: any[]): InstanceType<TWalker> } & { }, TWalkerResult extends CodeWalkerResultBase, TWalkerOptions extends WalkerOptions>(callingAnalyzer: RepoAnalyzerBase<any>, walker: TWalker, handler: CodeWalkerResultHandler<TWalkerResult>, options?: TWalkerOptions): void {
+  registerWalker<TWalker extends { new (...args: any[]): InstanceType<TWalker> }, TWalkerResult extends CodeWalkerResultBase, TWalkerOptions extends WalkerOptions>(callingAnalyzer: RepoAnalyzerBase<any>, walker: TWalker, handler: CodeWalkerResultHandler<TWalkerResult>, options?: TWalkerOptions): void {
     if (!this._analyzersToWalkers.has(callingAnalyzer)) {
       !this._analyzersToWalkers.set(callingAnalyzer, new Map());
     }
@@ -115,11 +131,11 @@ export class RepoAnalyzerEngine {
  
     this._analyzersToWalkers.get(callingAnalyzer)!.get(walker)!.push({ handler, options });
   }
-  
-  private compile(compilationRootPath: string, searchPaths: string[], sourceDiscoveryMode: SourceDiscoveryMode, respectErrors: boolean): { project: Project, files: SourceFile[] } {
+
+  private compile(compilationRootPath: string, searchPaths: string[], sourceDiscoveryMode: SourceDiscoveryMode, respectErrors: boolean): { project: Project, files: SourceFileTsMorph[] } {
     const project: Project = this.compileProject(compilationRootPath, searchPaths, sourceDiscoveryMode, respectErrors);
 
-    return { project, files: project.getSourceFiles().filter(f => !f.isInNodeModules()).map(sourceFile => sourceFile.compilerNode) };
+    return { project, files: project.getSourceFiles().filter(f => !f.isInNodeModules()) };
   }
 
   private compileProject(compilationRootPath: string, relativeSearchPaths: string[], sourceDiscoveryMode: SourceDiscoveryMode, respectErrors: boolean): Project {
@@ -177,6 +193,12 @@ export class RepoAnalyzerEngine {
     }
 
     return project;
+  }
+
+  private runIndependentHandlers(analyzer: RepoAnalyzerBase<any>, sourceFile: SourceFileTsMorph): void {
+    if (this._analyzersToHandlers.has(analyzer)) {
+      this._analyzersToHandlers.get(analyzer)!.forEach(handler => handler(sourceFile));
+    }
   }
   
   private searchRecursive(dir: string, pattern: string) {

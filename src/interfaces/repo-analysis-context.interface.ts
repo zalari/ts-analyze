@@ -1,11 +1,19 @@
 import { CodeWalkerResultHandler } from '..';
 import { WalkerOptions } from './walker-options.interface';
 import { CodeWalkerResultBase } from '../classes/code-walker-result-base.class';
+import { SourceFileHandler } from '../types/source-file-handler.type';
 
 /**
  * Represents the hook for communicating the run-time intent of this analyzer to the analyzer engine.
  */
 export interface RepoAnalysisContext {
+  
+  /**
+   * Registers a handler that is to be called for each source file during analyzation.
+   * @param handler 
+   */
+  registerHandler(handler: SourceFileHandler): void;
+  
   /**
    * Registers a walker that is to be called during analyzation.
    *
@@ -31,3 +39,4 @@ export interface RepoAnalysisContext {
    * https://stackoverflow.com/questions/52655236/typescript-instancetype-with-generic-parameter
    */
 }
+
