@@ -4,6 +4,7 @@ import { CodeWalkerNodeResult } from "../src/classes/code-walker-node-result.cla
 import { ClassDeclaration, Node } from "ts-morph";
 import { PropertyAccessFinder } from "../walkers";
 import { PropertyAccessFinderResult } from "../walkers/property-access-finder";
+import { FunctionCallFinder } from "../walkers/function-call-finder";
 
 interface MessageDependencyAnalyzerResult {
 
@@ -19,10 +20,11 @@ export class MessageDependencyAnalyzer extends RepoAnalyzerBase<MessageDependenc
     options.decoratorName = 'Message';
     
     context.registerWalker(DecoratorFinder, (results: CodeWalkerNodeResult[]) => this.handleDecoratorResults(results), options);
-    context.registerWalker(PropertyAccessFinder, (results: PropertyAccessFinderResult[]) => {}, { kind: 'method', name: ''} );
+    context.registerWalker(FunctionCallFinder, (results: PropertyAccessFinderResult[]) => {}, { kind: 'method', name: ''} );
   }
 
   getResult(): RepoAnalyzerResultBase<MessageDependencyAnalyzerResult> {
+
     this._messageNameToNode.forEach((value, key) => {
       console.log(value.findReferencesAsNodes().map(node => node.getParent()!.getText()));
     });

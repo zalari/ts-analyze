@@ -10,6 +10,7 @@ export class FunctionCallFinderResult extends CodeWalkerDataResult<FunctionCallF
 
 interface FunctionCallFinderTarget {
     functionName: string;
+    exportedFrom?: string;
 }
 
 interface FunctionCallFinderResultData extends FunctionCallFinderTarget {
@@ -31,13 +32,21 @@ export class FunctionCallFinder extends CodeWalkerBase<FunctionCallFinderOptions
                     
                     if (TypeGuards.isFunctionDeclaration(firstDeclaration)) {
                         const functionDeclaration = firstDeclaration as FunctionDeclaration;
-                        
-                        if (this.options.functionName === functionDeclaration.getName()) {
+
+                        if (this.isExportConstraintSatisfied(functionDeclaration, this.options.exportedFrom) && this.options.functionName === functionDeclaration.getName()) {
                             this.addResult(new FunctionCallFinderResult({ ...this.options, expression: this.languageService.attach(callExpression) as CallExpression }));
                         }
                     }
                 }
             }
         });
+    }
+
+    private isExportConstraintSatisfied(declaration: FunctionDeclaration, exportName?: string) {
+        if (!exportName) {
+            return true;
+        }
+
+        return declaration.getSourceFile().getFilePath().includes(exportName);
     }
 }

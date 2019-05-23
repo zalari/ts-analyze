@@ -1,3 +1,5 @@
+export function exportedFunction(){};
+
 function TestDecorator(constructor: Function) {}
 
 @TestDecorator
@@ -23,8 +25,11 @@ export class UsingClass {
 
     bar() {
         const decoratedClassInstance = new DecoratedClass();
+        
         this._foo.doWithInstanceAsArgument(decoratedClassInstance);
         this._foo.doWithTypeAsArgument(DecoratedClass);
+
+        exportedFunction();
     }
     
 }
