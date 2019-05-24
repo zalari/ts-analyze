@@ -1,7 +1,6 @@
 import { CodeWalkerBase, CodeWalkerDataResult } from '../src';
 import { SourceFile } from 'typescript';
-import { CodeWalkerNodeResult } from '../src/classes/code-walker-node-result.class';
-import { Node } from 'ts-morph';
+import { Node, DecoratableNode, ClassDeclaration, MethodDeclaration, PropertyDeclaration, SyntaxKind } from 'ts-morph';
 import { WalkerOptions } from '../src/interfaces/walker-options.interface';
 
 export interface DecoratorFinderOptions extends WalkerOptions {
@@ -11,6 +10,16 @@ export interface DecoratorFinderOptions extends WalkerOptions {
         methods?: boolean;
         properties?: boolean;
     }
+}
+
+export interface DecoratorFinderResult extends CodeWalkerDataResult<DecoratorFinderResultData> {
+   
+}
+
+interface DecoratorFinderResultData {
+    decoratorName: string;
+    node: ClassDeclaration | MethodDeclaration | PropertyDeclaration;
+    nodeKind: SyntaxKind;
 }
 
 /**
@@ -25,31 +34,41 @@ export class DecoratorFinder extends CodeWalkerBase<DecoratorFinderOptions> {
         const file = this.wrap(sourceFile);
         const options = DecoratorFinder.prepareOptions(this.options);
 
-        //TODO: Handle 'all'
+        const { decoratorName, targets } = options;
         file.getClasses().forEach(classNode => {
-            if (options.targets!.classes) {
-
-                if (classNode.getDecorator(options.decoratorName)) {
-                    this.addResult(new CodeWalkerNodeResult(classNode));
-                }
+            if (targets!.classes) {
+                this.doFoo(classNode, decoratorName);
             }
 
-            if (options.targets!.methods) {
+            if (targets!.methods) {
                 classNode.getMethods().forEach(methodNode => {
-                    if (methodNode.getDecorator(options.decoratorName)) {
-                        this.addResult(new CodeWalkerNodeResult(methodNode));
-                    }
+                    this.doFoo(methodNode, decoratorName);
                 });
             }
 
-            if (options.targets!.properties) {
+            if (targets!.properties) {
                 classNode.getProperties().forEach(propertyNode => {
-                    if (propertyNode.getDecorator(options.decoratorName)) {
-                        this.addResult(new CodeWalkerNodeResult(propertyNode));
-                    };
+                    this.doFoo(propertyNode, decoratorName);
                 });
             }
         });
+    }
+
+    private doFoo(node: ClassDeclaration | MethodDeclaration | PropertyDeclaration, decoratorName: 'all' | string) {
+        let finderResults: DecoratorFinderResultData[];
+
+        if (decoratorName === 'all') {
+            finderResults = node.getDecorators().map(v => { return { decoratorName, node, nodeKind: node.getKind() } })
+        } else {
+            if (node.getDecorator(decoratorName)) {
+                finderResults = [ { decoratorName, node, nodeKind: node.getKind() } ]
+            }
+            else {
+                finderResults = [];
+            }
+        }
+
+        finderResults.forEach(result => this.addResult(new CodeWalkerDataResult(result)));
     }
 
     private static prepareOptions(options?: DecoratorFinderOptions): DecoratorFinderOptions {

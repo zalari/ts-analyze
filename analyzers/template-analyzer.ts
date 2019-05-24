@@ -1,8 +1,9 @@
 import { CodeWalkerDataResult, CodeWalkerResultBase, RepoAnalyzerResultBase, RepoAnalyzerWithOptionsBase } from '../src/api';
 import { ClassNameCollector } from '../walkers/class-name-collector';
-import { DecoratorFinder } from '../walkers/decorator-finder';
+import { DecoratorFinder, DecoratorFinderResult } from '../walkers/decorator-finder';
 import { CodeWalkerNodeResult } from '../src/classes/code-walker-node-result.class';
 import { RepoAnalysisContext } from '../src/interfaces/repo-analysis-context.interface';
+import { SourceFile } from 'ts-morph';
 
 interface TemplateAnalyzerResult {
   nameResults: CodeWalkerResultBase[];
@@ -27,7 +28,7 @@ export class TemplateAnalyzer extends RepoAnalyzerWithOptionsBase<TemplateAnalyz
     // Register a manual walker
     const options = DecoratorFinder.getDefaultOptions();
     options.decoratorName = this.options.decoratorName;
-    context.registerWalker(DecoratorFinder, (results: CodeWalkerNodeResult[]) => this.handleDecoratorResults(results), options);
+    context.registerWalker(DecoratorFinder, (results: DecoratorFinderResult[]) => this.handleDecoratorResults(results), options);
 
     // Register an independent handler
     context.registerHandler(file => {
@@ -44,8 +45,8 @@ export class TemplateAnalyzer extends RepoAnalyzerWithOptionsBase<TemplateAnalyz
     results.forEach(r => this.nameResults.push(r));
   }
 
-  private handleDecoratorResults(results: CodeWalkerNodeResult[]) {
-    results.forEach(r => this.decoratorResults.push(CodeWalkerDataResult.create(r.data.getSourceFile().getFilePath())));
+  private handleDecoratorResults(results: DecoratorFinderResult[]) {
+    results.forEach(r => this.decoratorResults.push(CodeWalkerDataResult.create(r.data.node.getSourceFile().getFilePath())));
   }
 }
 

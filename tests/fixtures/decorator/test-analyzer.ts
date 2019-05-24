@@ -1,5 +1,5 @@
 import { RepoAnalyzerBase, RepoAnalysisContext, RepoAnalyzerResultBase } from "../../../src";
-import { DecoratorFinder } from "../../../walkers/decorator-finder";
+import { DecoratorFinder, DecoratorFinderResult } from "../../../walkers/decorator-finder";
 import { PropertyAccessFinder, PropertyAccessFinderOptions, PropertyAccessFinderResult } from "../../../walkers/property-access-finder";
 import { CodeWalkerNodeResult } from "../../../src/classes/code-walker-node-result.class";
 import { Node, ClassDeclaration, CallExpression, PropertyAccessExpression, SyntaxKind } from 'ts-morph';
@@ -10,10 +10,10 @@ export class TestAnalyzer extends RepoAnalyzerBase<any> {
 
   initialize(context: RepoAnalysisContext): void {
     const options = DecoratorFinder.getDefaultOptions();
-    options.decoratorName = 'TestDecorator';
-
-    context.registerWalker(DecoratorFinder, (results: CodeWalkerNodeResult[]) => this.handleDecoratorResults(results), options);
-    context.registerWalker(PropertyAccessFinder, (results) => this.handleMethodResults(results), { kind: 'method', propertyName: 'doWithTypeAsArgument', typeName: 'ExternalClass' } as PropertyAccessFinderOptions);
+    options.decoratorName = 'all';
+    
+    context.registerWalker(DecoratorFinder, (results: DecoratorFinderResult[]) => this.handleDecoratorResults(results), options);
+    context.registerWalker(PropertyAccessFinder, (results: PropertyAccessFinderResult[]) => this.handleMethodResults(results), { kind: 'method', propertyName: 'doWithTypeAsArgument', typeName: 'ExternalClass' } as PropertyAccessFinderOptions);
   }
 
   handleMethodResults(results: PropertyAccessFinderResult[]): void {
@@ -34,10 +34,9 @@ export class TestAnalyzer extends RepoAnalyzerBase<any> {
     return new RepoAnalyzerResultBase(this._results);
   }
 
-  private handleDecoratorResults(results: CodeWalkerNodeResult[]) {
+  private handleDecoratorResults(results: DecoratorFinderResult[]) {
     results.forEach(result => {
-      const classDeclaration = result.data as ClassDeclaration;
-      this._messageNameToNode.set(classDeclaration.getName()!, classDeclaration);
+      this._messageNameToNode.set(result.data.node.getName()!, result.data.node as ClassDeclaration);
     });
   }
 }
