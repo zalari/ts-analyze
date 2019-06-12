@@ -1,6 +1,6 @@
 import { CodeWalkerBase, CodeWalkerDataResult } from '../src';
 import { SourceFile } from 'typescript';
-import { Node, DecoratableNode, ClassDeclaration, MethodDeclaration, PropertyDeclaration, SyntaxKind } from 'ts-morph';
+import { ClassDeclaration, MethodDeclaration, PropertyDeclaration, SyntaxKind } from 'ts-morph';
 import { WalkerOptions } from '../src/interfaces/walker-options.interface';
 
 export interface DecoratorFinderOptions extends WalkerOptions {
@@ -37,24 +37,24 @@ export class DecoratorFinder extends CodeWalkerBase<DecoratorFinderOptions> {
         const { decoratorName, targets } = options;
         file.getClasses().forEach(classNode => {
             if (targets!.classes) {
-                this.doFoo(classNode, decoratorName);
+                this.analyze(classNode, decoratorName);
             }
 
             if (targets!.methods) {
                 classNode.getMethods().forEach(methodNode => {
-                    this.doFoo(methodNode, decoratorName);
+                    this.analyze(methodNode, decoratorName);
                 });
             }
 
             if (targets!.properties) {
                 classNode.getProperties().forEach(propertyNode => {
-                    this.doFoo(propertyNode, decoratorName);
+                    this.analyze(propertyNode, decoratorName);
                 });
             }
         });
     }
 
-    private doFoo(node: ClassDeclaration | MethodDeclaration | PropertyDeclaration, decoratorName: 'all' | string) {
+    private analyze(node: ClassDeclaration | MethodDeclaration | PropertyDeclaration, decoratorName: 'all' | string) {
         let finderResults: DecoratorFinderResultData[];
 
         if (decoratorName === 'all') {
@@ -67,7 +67,7 @@ export class DecoratorFinder extends CodeWalkerBase<DecoratorFinderOptions> {
                 finderResults = [];
             }
         }
-
+        
         finderResults.forEach(result => this.addResult(new CodeWalkerDataResult(result)));
     }
 
