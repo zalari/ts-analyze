@@ -1,15 +1,15 @@
 export class RepoAnalyzerResultBase<TData> {
-    constructor(data: TData) {
-        this.data = data;
-    }
+  constructor(data: TData) {
+    this.data = data;
+  }
 
-    data: TData;
+  data: TData;
 
-    asJson(): string {
-        return JSON.stringify(this.data, null, 2);
-    }
+  asJson(): string {
+    return JSON.stringify(this.data, null, 2);
+  }
 
-    asPrettyString(): string {
-        return 'No pretty print defined';
-    }
+  asPrettyString(): string {
+    return 'No pretty print defined';
+  }
 }

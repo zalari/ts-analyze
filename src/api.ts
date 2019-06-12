@@ -1,12 +1,11 @@
-export { 
-    CodeAutoWalkerBase,
-    CodeWalkerBase,
-    CodeWalkerDataResult,
-    CodeWalkerNodeResult,
-    CodeWalkerResultBase,
-    FileSystemUtils,
-    RepoAnalyzerBase,
-    RepoAnalyzerResultBase,
-    RepoAnalysisContext,
-    RepoAnalyzerWithOptionsBase,
+export {
+  CodeAutoWalkerBase,
+  CodeWalkerBase,
+  CodeWalkerNodeResult,
+  CodeWalkerResultBase,
+  FileSystemUtils,
+  RepoAnalyzerBase,
+  RepoAnalyzerResultBase,
+  RepoAnalysisContext,
+  RepoAnalyzerWithOptionsBase
 } from './index';

@@ -1,7 +1,13 @@
 {
-    "rulesDirectory": ["dist/rules"],
-    "rules": {
-        "no-imports": false,
-        "message-location": [true, "Test"]
-    }
+  "rulesDirectory": [
+    "dist/rules"
+  ],
+  "rules": {
+    "no-imports": false,
+    "message-location": [
+      true,
+      "Test",
+      "asdasd"
+    ]
+  }
 }

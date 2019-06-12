@@ -1,12 +1,8 @@
 import { Node } from 'ts-morph';
-import { CodeWalkerDataResult } from './code-walker-data-result.class';
+import { CodeWalkerResultBase } from './code-walker-result-base.class';
 
-export class CodeWalkerNodeResult extends CodeWalkerDataResult<Node> {
-    static create<TNode>(node: TNode): CodeWalkerDataResult<TNode> {
-        return new CodeWalkerDataResult<TNode>(node);
-      }
-
-    constructor(node: Node) {
-        super(node);
-    }
+export class CodeWalkerNodeResult extends CodeWalkerResultBase<Node> {
+  constructor(node: Node) {
+    super(node);
+  }
 }

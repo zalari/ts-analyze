@@ -1,19 +1,24 @@
-import { CodeWalkerResultBase, CodeWalkerImplementation, CodeWalkerImplementationInterface, RepoAnalysisContextImplementation } from '..';
+import { CodeWalkerImplementation, CodeWalkerImplementationInterface, CodeWalkerResultBase, RepoAnalysisContextImplementation } from '..';
 import { CompilerNodeToWrappedType, Node as TsMorphNode } from 'ts-morph';
-import { Fix, RuleFailure, IOptions, RuleWalker } from 'tslint';
-import { Node, SourceFile, } from 'typescript';
+import { Fix, IOptions, RuleFailure, RuleWalker } from 'tslint';
+import { Node, SourceFile } from 'typescript';
 import { WalkerLanguageService } from './walker-language-service.class';
 
 /**
  * Abstract base class for implementing automatic code walkers.
  * Works by overriding the necessary visitXYZ methods.
- * 
+ *
  * NOTE: For performance reasons you should prefer {@link CodeWalkerBase} if possible.
  */
 export abstract class CodeAutoWalkerBase extends RuleWalker implements CodeWalkerImplementationInterface {
   private readonly _implementation: CodeWalkerImplementation;
 
-  constructor(sourceFile: SourceFile, options: IOptions = { ruleName: 'default', ruleArguments: [], ruleSeverity: 'off', disabledIntervals: [] }, context?: RepoAnalysisContextImplementation) {
+  constructor(sourceFile: SourceFile, options: IOptions = {
+    ruleName: 'default',
+    ruleArguments: [],
+    ruleSeverity: 'off',
+    disabledIntervals: []
+  }, context?: RepoAnalysisContextImplementation) {
     super(sourceFile, options);
     this._implementation = new CodeWalkerImplementation(context);
   }
@@ -26,29 +31,29 @@ export abstract class CodeAutoWalkerBase extends RuleWalker implements CodeWalke
   }
 
   /**
-  * @inheritdoc
-  */
+   * @inheritdoc
+   */
   addResult(result: CodeWalkerResultBase): void {
     this._implementation.addResult(result);
   }
 
   /**
-  * @inheritdoc
-  */
+   * @inheritdoc
+   */
   attach<T extends TsMorphNode>(unattachedNode: T): TsMorphNode {
     return this._implementation.attach(unattachedNode);
   }
 
   /**
-  * @inheritdoc
-  */
-  getResults(): CodeWalkerResultBase[] {
+   * @inheritdoc
+   */
+  getResults<T extends any>(): CodeWalkerResultBase<T>[] {
     return this._implementation.getResults();
   }
 
   /**
-  * @inheritdoc
-  */
+   * @inheritdoc
+   */
   wrap<T extends Node>(node: T): CompilerNodeToWrappedType<T> {
     return this._implementation.wrap(node);
   }

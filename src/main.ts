@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import { RepoAnalyzerEngine } from './classes/repo-analyzer-engine.class';
-import { pascalCase, camelCase } from 'change-case';
+import { camelCase, pascalCase } from 'change-case';
 
 const logger = winston.createLogger({
   transports: [
@@ -30,22 +30,22 @@ try {
         })
         .option('options', {
           type: 'array',
-          describe: 'options as key:value pairs to be send to the analyzer',
+          describe: 'options as key:value pairs to be send to the analyzer'
         })
         .option('sub-paths', {
           type: 'array',
-          describe: 'relative (to root path) to apply the analyzer on',
+          describe: 'relative (to root path) to apply the analyzer on'
         })
         .option('json', {
           type: 'string',
-          describe: 'output analyzer result to specified json file',
-        })
+          describe: 'output analyzer result to specified json file'
+        });
     }, (args) => {
       const analyzerName = args.analyzer as string;
       const rootPath = args.path;
-      const options = parseOptions(args.options as string[])
+      const options = parseOptions(args.options as string[]);
       const searchPaths = args.subPaths;
-  
+
       const analyzerInstance = loadAnalyzer(analyzerName, '.', searchPaths, options);
 
       const engine = new RepoAnalyzerEngine(path.resolve(rootPath as string), logger);
@@ -96,13 +96,13 @@ function parseOptions(rawStrings: string[]): object | undefined {
 }
 
 function loadAnalyzer(name: string, ...args: any[]): any {
-  const expectedFilePath = path.join(process.cwd(), 'dist', 'analyzers', `${name}-analyzer.js`);
+  const expectedFilePath = path.join(process.cwd(), 'dist', 'analyzers', `${ name }-analyzer.js`);
 
   if (!fs.existsSync(expectedFilePath)) {
-    throw new Error(`Could not locate analyzer: ${expectedFilePath}`);
+    throw new Error(`Could not locate analyzer: ${ expectedFilePath }`);
   }
 
-  const analyzerExport = require(expectedFilePath)[pascalCase(`${name}-analyzer`)];
+  const analyzerExport = require(expectedFilePath)[pascalCase(`${ name }-analyzer`)];
   const instance = new analyzerExport(...args);
 
   return instance;

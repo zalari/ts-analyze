@@ -7,13 +7,13 @@ import { SourceFileHandler } from '../types/source-file-handler.type';
  * Represents the hook for communicating the run-time intent of this analyzer to the analyzer engine.
  */
 export interface RepoAnalysisContext {
-  
+
   /**
    * Registers a handler that is to be called for each source file during analyzation.
-   * @param handler 
+   * @param handler
    */
   registerHandler(handler: SourceFileHandler): void;
-  
+
   /**
    * Registers a walker that is to be called during analyzation.
    *
@@ -30,12 +30,12 @@ export interface RepoAnalysisContext {
   log(message: string): void;
 
   /**
-   * TODO: 
+   * TODO:
    * It would be great to offer an API that infers the correct TOption and TResult type
    * depending on the class type passed to the registration functions so the client does not
    * have to do this manually. AFAIK this is not possible with the current approach that works by
    * passing the class constructor (see the links below for example).
-   * 
+   *
    * https://stackoverflow.com/questions/52655236/typescript-instancetype-with-generic-parameter
    */
 }

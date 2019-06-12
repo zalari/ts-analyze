@@ -5,6 +5,7 @@ test('Sanity Check', () => {
   const testAnalyzer = new TestAnalyzer('common');
   const result = TestUtil.runAnalyzer(testAnalyzer);
 
-  expect(result.data).toHaveLength(1);
+  expect(result.data)
+    .toHaveLength(1);
 });
 

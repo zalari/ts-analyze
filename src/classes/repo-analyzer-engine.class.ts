@@ -1,9 +1,9 @@
-import { RepoAnalyzerBase, CodeWalkerResultHandler, RepoAnalysisContextImplementation, RepoAnalyzerResultBase, CodeWalkerImplementationInterface, CodeWalkerBase, CodeAutoWalkerBase, CodeWalkerResultBase } from '..';
+import { CodeAutoWalkerBase, CodeWalkerBase, CodeWalkerResultBase, CodeWalkerResultHandler, RepoAnalysisContextImplementation, RepoAnalyzerBase, RepoAnalyzerResultBase } from '..';
 import fs from 'fs';
 import path from 'path';
 import winston from 'winston';
-import { Project, SourceFile as SourceFileTsMorph  } from 'ts-morph';
-import { SourceFile, CompilerOptions, ScriptTarget, ModuleKind, ModuleResolutionKind, DiagnosticCategory } from 'typescript';
+import { Project, SourceFile as SourceFileTsMorph } from 'ts-morph';
+import { CompilerOptions, DiagnosticCategory, ModuleKind, ModuleResolutionKind, ScriptTarget } from 'typescript';
 import { isArray } from 'util';
 import { SourceDiscoveryMode } from '../enums/source-discovery-mode.enum';
 import { RepoAnalyzerEngineRunOptions } from '../interfaces/repo-analyzer-engine-run-options.interface';
@@ -15,13 +15,15 @@ import { SourceFileHandler } from '../types/source-file-handler.type';
  */
 export class RepoAnalyzerEngine {
   private readonly _logger!: winston.Logger;
-  private readonly _analyzersToWalkers: Map<RepoAnalyzerBase<any>, Map<any, { handler: CodeWalkerResultHandler<any>, options?: any }[]>>;  
+
+  private readonly _analyzersToWalkers: Map<RepoAnalyzerBase<any>, Map<any, { handler: CodeWalkerResultHandler<any>, options?: any }[]>>;
+
   private readonly _analyzersToHandlers: Map<RepoAnalyzerBase<any>, SourceFileHandler[]>;
 
   constructor(private _repoRootPath: string, logger?: winston.Logger) {
     this._analyzersToWalkers = new Map<RepoAnalyzerBase<any>, Map<any, { handler: CodeWalkerResultHandler<any>, options?: any }[]>>();
     this._analyzersToHandlers = new Map<RepoAnalyzerBase<any>, SourceFileHandler[]>();
-    
+
     this._logger = logger!;
 
     if (!this._logger) {
@@ -40,7 +42,7 @@ export class RepoAnalyzerEngine {
     const sourceDiscoveryMode = options ? options.sourceDiscoveryMode : SourceDiscoveryMode.TsConfig;
 
     let analyzers: RepoAnalyzerBase<any>[];
-    
+
     if (!isArray(analyzerOrArray)) {
       analyzers = [analyzerOrArray as RepoAnalyzerBase<any>];
     } else {
@@ -54,56 +56,62 @@ export class RepoAnalyzerEngine {
       const context = new RepoAnalysisContextImplementation(this, compilationResult.project, analyzer, this._logger);
 
       analyzer.initialize(context);
-     
+
       compilationResult.files.forEach(sourceFileTsMorph => {
         this.runIndependentHandlers(analyzer, sourceFileTsMorph);
 
         const sourceFile = sourceFileTsMorph.compilerNode;
 
         const walkersToHandlers = this._analyzersToWalkers.get(analyzer)!;
-          walkersToHandlers.forEach((handlersWithOptions, walkerType) => {
+        walkersToHandlers.forEach((handlersWithOptions, walkerType) => {
 
-            if (walkerType.prototype instanceof CodeWalkerBase) {
+          if (walkerType.prototype instanceof CodeWalkerBase) {
 
-              handlersWithOptions.forEach(handlerWithOptions => {
-                let walkerInstance; 
+            handlersWithOptions.forEach(handlerWithOptions => {
+              let walkerInstance;
 
-                if (handlerWithOptions.options && handlerWithOptions.options.sourceFilePaths) {
-                  const paths: string[] = handlerWithOptions.options.sourceFilePaths;
-                  
-                  if (paths.indexOf(sourceFile.fileName) !== -1) {
-                    walkerInstance = new walkerType(sourceFile, 'walker', handlerWithOptions.options, context);
-                  }
-                  
-                } else {
+              if (handlerWithOptions.options && handlerWithOptions.options.sourceFilePaths) {
+                const paths: string[] = handlerWithOptions.options.sourceFilePaths;
+
+                if (paths.indexOf(sourceFile.fileName) !== -1) {
                   walkerInstance = new walkerType(sourceFile, 'walker', handlerWithOptions.options, context);
                 }
 
-                walkerInstance.walk(sourceFile);
-             
-                if (handlerWithOptions.handler) {
-                  const walkerResults = walkerInstance.getResults();
-                  handlerWithOptions.handler(walkerResults);
-                }
-              });
+              } else {
+                walkerInstance = new walkerType(sourceFile, 'walker', handlerWithOptions.options, context);
+              }
 
-            } else if (walkerType.prototype instanceof CodeAutoWalkerBase) {
-              handlersWithOptions.forEach(handlerWithOptions => {
-                const options = { ...handlerWithOptions.options, ruleName: 'default', ruleArguments: [], ruleSeverity: 'off', disabledIntervals: [] }
-                const walkerInstance = new walkerType(sourceFile, options, context);
-                walkerInstance.walk(sourceFile);
-              
-                if (handlerWithOptions.handler) {
-                  const walkerResults = walkerInstance.getResults();
-                  handlerWithOptions.handler(walkerResults);
-                }
-              });
-            }
-          });
+              walkerInstance.walk(sourceFile);
+
+              if (handlerWithOptions.handler) {
+                const walkerResults = walkerInstance.getResults();
+                handlerWithOptions.handler(walkerResults);
+              }
+            });
+
+          } else if (walkerType.prototype instanceof CodeAutoWalkerBase) {
+            handlersWithOptions.forEach(handlerWithOptions => {
+              const options = {
+                ...handlerWithOptions.options,
+                ruleName: 'default',
+                ruleArguments: [],
+                ruleSeverity: 'off',
+                disabledIntervals: []
+              };
+              const walkerInstance = new walkerType(sourceFile, options, context);
+              walkerInstance.walk(sourceFile);
+
+              if (handlerWithOptions.handler) {
+                const walkerResults = walkerInstance.getResults();
+                handlerWithOptions.handler(walkerResults);
+              }
+            });
+          }
         });
-
-        result.set(analyzer, analyzer.getResult());
       });
+
+      result.set(analyzer, analyzer.getResult());
+    });
 
     if (result.size == 1) {
       return result.get(analyzerOrArray as RepoAnalyzerBase<any>) as RepoAnalyzerResultBase<any>;
@@ -119,23 +127,27 @@ export class RepoAnalyzerEngine {
 
     this._analyzersToHandlers.get(callingAnalyzer)!.push(handler);
   }
-  
-  registerWalker<TWalker extends { new (...args: any[]): InstanceType<TWalker> }, TWalkerResult extends CodeWalkerResultBase, TWalkerOptions extends WalkerOptions>(callingAnalyzer: RepoAnalyzerBase<any>, walker: TWalker, handler: CodeWalkerResultHandler<TWalkerResult>, options?: TWalkerOptions): void {
+
+  registerWalker<TWalker extends { new(...args: any[]): InstanceType<TWalker> }, TWalkerResult extends CodeWalkerResultBase, TWalkerOptions extends WalkerOptions>(callingAnalyzer: RepoAnalyzerBase<any>, walker: TWalker, handler: CodeWalkerResultHandler<TWalkerResult>, options?: TWalkerOptions): void {
     if (!this._analyzersToWalkers.has(callingAnalyzer)) {
       !this._analyzersToWalkers.set(callingAnalyzer, new Map());
     }
-    
+
     if (!this._analyzersToWalkers.get(callingAnalyzer)!.has(walker)) {
       this._analyzersToWalkers.get(callingAnalyzer)!.set(walker, []);
     }
- 
+
     this._analyzersToWalkers.get(callingAnalyzer)!.get(walker)!.push({ handler, options });
   }
 
   private compile(compilationRootPath: string, searchPaths: string[], sourceDiscoveryMode: SourceDiscoveryMode, respectErrors: boolean): { project: Project, files: SourceFileTsMorph[] } {
     const project: Project = this.compileProject(compilationRootPath, searchPaths, sourceDiscoveryMode, respectErrors);
 
-    return { project, files: project.getSourceFiles().filter(f => !f.isInNodeModules()) };
+    return {
+      project,
+      files: project.getSourceFiles()
+        .filter(f => !f.isInNodeModules())
+    };
   }
 
   private compileProject(compilationRootPath: string, relativeSearchPaths: string[], sourceDiscoveryMode: SourceDiscoveryMode, respectErrors: boolean): Project {
@@ -156,15 +168,15 @@ export class RepoAnalyzerEngine {
     const project = new Project({ compilerOptions });
 
     relativeSearchPaths.forEach(searchPath => {
-      const rootWithRelativePath = `${path.join(compilerOptions.rootDir!, searchPath)}`;
+      const rootWithRelativePath = `${ path.join(compilerOptions.rootDir!, searchPath) }`;
 
       if (sourceDiscoveryMode === SourceDiscoveryMode.TsConfig) {
         const tsConfigPaths = this.searchRecursive(rootWithRelativePath, 'tsconfig.json');
 
         tsConfigPaths.forEach(p => {
-            this._logger.info(`Found tsconfig.json at ${p}. Adding to compilation`);
-            project.addSourceFilesFromTsConfig(p);
-        })
+          this._logger.info(`Found tsconfig.json at ${ p }. Adding to compilation`);
+          project.addSourceFilesFromTsConfig(p);
+        });
       } else if (sourceDiscoveryMode === SourceDiscoveryMode.All) {
         const paths = this.searchRecursive(rootWithRelativePath, '.ts');
         project.addExistingSourceFiles(paths);
@@ -187,8 +199,8 @@ export class RepoAnalyzerEngine {
           message: diagnostic.getMessageText(),
           file: diagnostic.getSourceFile() ? diagnostic.getSourceFile()!.getFilePath() : undefined
         }));
-  
-        throw new Error(`Compilation has errors: ${JSON.stringify(messages, null, 2)}`);
+
+        throw new Error(`Compilation has errors: ${ JSON.stringify(messages, null, 2) }`);
       }
     }
 
@@ -200,27 +212,28 @@ export class RepoAnalyzerEngine {
       this._analyzersToHandlers.get(analyzer)!.forEach(handler => handler(sourceFile));
     }
   }
-  
+
   private searchRecursive(dir: string, pattern: string) {
     if (dir.endsWith('node_modules')) {
       return [];
     }
 
     let results: string[] = [];
-  
-    fs.readdirSync(dir).forEach((dirInner) => {
-      dirInner = path.resolve(dir, dirInner);
-      const stat = fs.statSync(dirInner);
-      if (stat.isDirectory()) {
-        results = results.concat(this.searchRecursive(dirInner, pattern));
-      }
 
-      if (stat.isFile() && dirInner.endsWith(pattern)) {
-        results.push(dirInner);
-      }
+    fs.readdirSync(dir)
+      .forEach((dirInner) => {
+        dirInner = path.resolve(dir, dirInner);
+        const stat = fs.statSync(dirInner);
+        if (stat.isDirectory()) {
+          results = results.concat(this.searchRecursive(dirInner, pattern));
+        }
 
-    });
-  
+        if (stat.isFile() && dirInner.endsWith(pattern)) {
+          results.push(dirInner);
+        }
+
+      });
+
     return results;
   };
 }

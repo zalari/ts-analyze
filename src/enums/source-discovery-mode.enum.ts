@@ -1,4 +1,4 @@
 export enum SourceDiscoveryMode {
-    TsConfig,
-    All
+  TsConfig,
+  All
 }

@@ -1,6 +1,5 @@
-import { CodeAutoWalkerBase } from './classes/code-auto-walker-base.class'
+import { CodeAutoWalkerBase } from './classes/code-auto-walker-base.class';
 import { CodeWalkerBase } from './classes/code-walker-base.class';
-import { CodeWalkerDataResult } from './classes/code-walker-data-result.class';
 import { CodeWalkerImplementation } from './classes/code-walker-implementation.class';
 import { CodeWalkerImplementationInterface } from './interfaces/code-walker-implementation.interface';
 import { CodeWalkerNodeResult } from './classes/code-walker-node-result.class';
@@ -18,7 +17,6 @@ import { RepoAnalyzerWithOptionsBase } from './classes/repo-analyzer-with-option
 export {
   CodeAutoWalkerBase,
   CodeWalkerBase,
-  CodeWalkerDataResult,
   CodeWalkerNodeResult,
   CodeWalkerImplementation,
   CodeWalkerImplementationInterface,

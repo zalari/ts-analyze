@@ -1,12 +1,12 @@
-import { CodeWalkerResultHandler, RepoAnalyzerBase, RepoAnalyzerEngine, CodeWalkerResultBase } from '..';
+import { CodeWalkerResultBase, CodeWalkerResultHandler, RepoAnalyzerBase, RepoAnalyzerEngine } from '..';
 import * as winston from 'winston';
-import { LanguageService, Node, Project } from 'ts-morph';
+import { Project } from 'ts-morph';
 import { RepoAnalysisContext } from '../interfaces/repo-analysis-context.interface';
 import { WalkerOptions } from '../interfaces/walker-options.interface';
 import { SourceFileHandler } from '../types/source-file-handler.type';
 
 export class RepoAnalysisContextImplementation implements RepoAnalysisContext {
- 
+
   constructor(
     private _runner: RepoAnalyzerEngine,
     private _project: Project,

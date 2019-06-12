@@ -8,21 +8,32 @@ const engine = new RepoAnalyzerEngine(process.cwd());
 test('Sanity Check', () => {
   const enumsDirAnalyzer = new TemplateAnalyzer('/src/enums', ['.'], { decoratorName: 'Test' });
   const classDirAnalyzer = new TemplateAnalyzer('/src/classes', ['.'], { decoratorName: 'Test' });
-  const withSearchPathsAnalyzer = new TemplateAnalyzer('.', [ '/src/enums', '/src/classes' ], { decoratorName: 'Test' });
-  
-  const multiResult = engine.run([enumsDirAnalyzer, classDirAnalyzer, withSearchPathsAnalyzer], { sourceDiscoveryMode: SourceDiscoveryMode.All, respectErrors: false });
-  const singleResult = engine.run(new TemplateAnalyzer('.', ['.'], { decoratorName: 'Test' }), { sourceDiscoveryMode: SourceDiscoveryMode.All, respectErrors: false });
+  const withSearchPathsAnalyzer = new TemplateAnalyzer('.', ['/src/enums', '/src/classes'], { decoratorName: 'Test' });
+
+  const multiResult = engine.run([enumsDirAnalyzer, classDirAnalyzer, withSearchPathsAnalyzer], {
+    sourceDiscoveryMode: SourceDiscoveryMode.All,
+    respectErrors: false
+  });
+  const singleResult = engine.run(new TemplateAnalyzer('.', ['.'], { decoratorName: 'Test' }), {
+    sourceDiscoveryMode: SourceDiscoveryMode.All,
+    respectErrors: false
+  });
 
   // No classes in enums directory
-  expect(enumsDirAnalyzer.nameResults.length).toBe(0)
-  
+  expect(enumsDirAnalyzer.nameResults.length)
+    .toBe(0);
+
   // Some classes in classes directory
-  expect(classDirAnalyzer.nameResults.length).toBeGreaterThan(0);
-  expect(withSearchPathsAnalyzer.nameResults.length).toBeGreaterThan(0);
-  
+  expect(classDirAnalyzer.nameResults.length)
+    .toBeGreaterThan(0);
+  expect(withSearchPathsAnalyzer.nameResults.length)
+    .toBeGreaterThan(0);
+
   // 3 analyzers should yield 3 results
-  expect(multiResult.size).toBe(3);
+  expect(multiResult.size)
+    .toBe(3);
 
   // 1 analyzer should yield 1 result
-  expect(singleResult).toBeDefined();
+  expect(singleResult)
+    .toBeDefined();
 });

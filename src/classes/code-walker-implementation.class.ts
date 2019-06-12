@@ -1,4 +1,4 @@
-import { CodeWalkerImplementationInterface, CodeWalkerResultBase, CodeWalkerDataResult, RepoAnalysisContextImplementation } from '..';
+import { CodeWalkerImplementationInterface, CodeWalkerResultBase, RepoAnalysisContextImplementation } from '..';
 import * as ts from 'typescript';
 import * as tsMorph from 'ts-morph';
 import { CodeWalkerNodeResult } from './code-walker-node-result.class';
@@ -7,6 +7,7 @@ import { WalkerLanguageService } from './walker-language-service.class';
 
 export class CodeWalkerImplementation implements CodeWalkerImplementationInterface {
   private readonly _results: CodeWalkerResultBase[] = [];
+
   private readonly _languageService!: WalkerLanguageService;
 
   constructor(private _context?: RepoAnalysisContextImplementation) {
@@ -14,10 +15,10 @@ export class CodeWalkerImplementation implements CodeWalkerImplementationInterfa
       this._languageService = new WalkerLanguageService(this._context.project);
     }
   }
-  
+
   get languageService(): WalkerLanguageService {
     return this._languageService;
-  } 
+  }
 
   wrap<T extends ts.Node>(node: T): tsMorph.CompilerNodeToWrappedType<T> {
     return tsMorph.createWrappedNode(node);
@@ -44,7 +45,7 @@ export class CodeWalkerImplementation implements CodeWalkerImplementationInterfa
     return this.isDataResult(arg) && arg.data.compilerNode;
   }
 
-  private isDataResult(arg: CodeWalkerResultBase): arg is CodeWalkerDataResult<any> {
+  private isDataResult(arg: CodeWalkerResultBase): arg is CodeWalkerResultBase<any> {
     return arg.kind === CodeWalkerResultKind.Data;
   }
 }
