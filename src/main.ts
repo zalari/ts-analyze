@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import { RepoAnalyzerEngine } from './classes/repo-analyzer-engine.class';
-import { camelCase, pascalCase } from 'change-case';
+import { pascalCase } from 'change-case';
 
 const logger = winston.createLogger({
   transports: [
@@ -29,8 +29,8 @@ try {
           describe: 'root path to run analyzer on'
         })
         .option('options', {
-          type: 'array',
-          describe: 'options as key:value pairs to be send to the analyzer'
+          type: 'string',
+          describe: 'options as JSON string or path to a JSON file to be send to the analyzer'
         })
         .option('sub-paths', {
           type: 'array',
@@ -43,7 +43,7 @@ try {
     }, (args) => {
       const analyzerName = args.analyzer as string;
       const rootPath = args.path;
-      const options = parseOptions(args.options as string[]);
+      const options = parseOptions(args.options);
       const searchPaths = args.subPaths;
 
       const analyzerInstance = loadAnalyzer(analyzerName, '.', searchPaths, options);
@@ -70,29 +70,46 @@ try {
 
 process.exit(0);
 
-function parseOptions(rawStrings: string[]): object | undefined {
-  if (!rawStrings) {
+function parseOptions(jsonStringOrPath?: string): object | undefined {
+  if (!jsonStringOrPath) {
     return undefined;
   }
 
-  if (rawStrings.length === 0) {
-    return undefined;
+  const tryParseJson = (json: string) => {
+    try {
+      return JSON.parse(json);
+    } catch (e) {
+      return undefined;
+    }
+  };
+
+  const tryReadJsonFile = (filePath: string) => {
+    try {
+      return fs.readFileSync(path.join(process.cwd(), filePath), { encoding: 'utf8' });
+    } catch (e) {
+      return undefined;
+    }
+  };
+
+  let options;
+  options = tryParseJson(jsonStringOrPath);
+
+  if (options) {
+    return options;
   }
 
-  const options = Object.create(null);
+  options = tryReadJsonFile(jsonStringOrPath);
 
-  try {
-    rawStrings.forEach(s => {
-      const [key, value] = s.split('=');
-      if (key && value) {
-        options[camelCase(key)] = value;
-      }
-    });
-  } catch {
-    throw new Error('Invalid options supplied');
+  if (options) {
+    options = tryParseJson(options);
   }
 
-  return options;
+  if (options) {
+    return options;
+  }
+
+  logger.error('Could not read options.');
+  process.exit(1);
 }
 
 function loadAnalyzer(name: string, ...args: any[]): any {
