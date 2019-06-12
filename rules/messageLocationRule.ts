@@ -3,18 +3,22 @@ import * as ts from 'typescript';
 import { DecoratorFinder } from '../walkers/decorator-finder';
 import { FileSystemUtils, CodeWalkerNodeResult } from '../src/api';
 
+const DEFAULT_DECORATOR_NAME = 'Message';
+const DEFAULT_PACKAGE_NAME = 'messages';
+const RULE_NAME = 'message-location';
+
 export class Rule extends Lint.Rules.AbstractRule {
   public apply(sourceFile: ts.SourceFile): Lint.RuleFailure[] {
     const decoratorFinderOptions = DecoratorFinder.getDefaultOptions();
     const ruleArguments = this.getOptions().ruleArguments;
 
     let [decoratorName, expectedPackageName]: string[] = ruleArguments;
-    decoratorName = decoratorName || 'Message';
-    expectedPackageName = expectedPackageName || 'messages';
+    decoratorName = decoratorName || DEFAULT_DECORATOR_NAME;
+    expectedPackageName = expectedPackageName || DEFAULT_PACKAGE_NAME;
 
     decoratorFinderOptions.decoratorName = decoratorName;
 
-    const decoratorFinder = new DecoratorFinder(sourceFile, 'message-location', decoratorFinderOptions)
+    const decoratorFinder = new DecoratorFinder(sourceFile, RULE_NAME, decoratorFinderOptions)
     this.applyWithWalker(decoratorFinder);
 
     const results = decoratorFinder.getResults();
@@ -31,7 +35,7 @@ export class Rule extends Lint.Rules.AbstractRule {
         if (foundPackageName !== expectedPackageName) {
           const failureString = `Message with Decorator @${decoratorName} is expected to be in package ${expectedPackageName} but was found in ${foundPackageName}.`;
 
-          const failure = new Lint.RuleFailure(sourceFile, nodeResult.data.getStart(), nodeResult.data.getEnd(), failureString, 'message-location');
+          const failure = new Lint.RuleFailure(sourceFile, nodeResult.data.getStart(), nodeResult.data.getEnd(), failureString, RULE_NAME);
           failures.push(failure);
         }
       }
