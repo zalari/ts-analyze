@@ -31,14 +31,17 @@ try {
           describe: 'root path to run analyzer on'
         })
         .option('options', {
+          alias: 'o',
           type: 'string',
           describe: 'options as JSON string or path to a JSON file to be send to the analyzer'
         })
         .option('sub-paths', {
+          alias: 'p',
           type: 'array',
           describe: 'relative (to root path) to apply the analyzer on'
         })
         .option('json', {
+          alias: 'j',
           type: 'string',
           describe: 'output analyzer result to specified json file'
         });
