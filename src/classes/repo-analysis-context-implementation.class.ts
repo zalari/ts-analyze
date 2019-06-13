@@ -8,18 +8,18 @@ import { SourceFileHandler } from '../types/source-file-handler.type';
 export class RepoAnalysisContextImplementation implements RepoAnalysisContext {
 
   constructor(
-    private _runner: RepoAnalyzerEngine,
+    private _engine: RepoAnalyzerEngine,
     private _project: Project,
     private _analyzer: RepoAnalyzerBase<any>,
     private _logger: winston.Logger) {
   }
 
   registerHandler(handler: SourceFileHandler): void {
-    this._runner.registerIndependentHandler(this._analyzer, handler);
+    this._engine.registerIndependentHandler(this._analyzer, handler);
   }
 
   registerWalker<TWalker extends { new(...args: any[]): InstanceType<TWalker> }, TResult extends CodeWalkerResultBase, TOptions extends WalkerOptions>(walker: TWalker, handler: CodeWalkerResultHandler<TResult>, options?: TOptions): void {
-    this._runner.registerWalker(this._analyzer, walker, handler, options);
+    this._engine.registerWalker(this._analyzer, walker, handler, options);
   }
 
   get project(): Project {
