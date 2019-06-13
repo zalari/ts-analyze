@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npm run clean && tsc --project .",
     "clean": "shx rm -rf dist",
-    "start": "node ./dist/src/main -- run-analyzer",
+    "start": "node ./dist/src/main run-analyzer --",
     "test": "jest"
   },
   "author": "",

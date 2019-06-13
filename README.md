@@ -37,4 +37,4 @@ First:
 * Prepare the project: `npm install`
 * Build the project: `npm run build`
 
-Then use `npm start -- [analyzer-name] [path]`, e.g. if you want to run the TemplateAnalyzer on this project you would use `npm start -- template .`;
+Then use `node dist/src/main.js [analyzer-name] [path] --options [options]`, e.g. if you want to run the TemplateAnalyzer on this project you would use `node dist/src/main.js run-analyzer template . --options "{ \"decoratorName\": \"Test\" }"`;
