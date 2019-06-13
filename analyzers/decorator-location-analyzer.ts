@@ -42,4 +42,10 @@ export class DecoratorLocationAnalyzer extends RepoAnalyzerWithOptionsBase<Decor
     return new RepoAnalyzerResultBase({ locations });
 
   }
+
+  getExampleOptions(options?: any): DecoratorLocationAnalyzerOptions {
+    return {
+      decoratorName: 'Test'
+    };
+  }
 }

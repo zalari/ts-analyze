@@ -7,6 +7,8 @@ import * as fs from 'fs';
 
 import { RepoAnalyzerEngine } from './classes/repo-analyzer-engine.class';
 import { pascalCase } from 'change-case';
+import { RepoAnalyzerWithOptionsBase } from './classes/repo-analyzer-with-options-base.class';
+import { RepoAnalyzerBase } from '.';
 
 const logger = winston.createLogger({
   transports: [
@@ -46,11 +48,11 @@ try {
       const options = parseOptions(args.options);
       const searchPaths = args.subPaths;
 
-      const analyzerInstance = loadAnalyzer(analyzerName, '.', searchPaths, options);
+      const loadAnalyzerResult = loadAnalyzer(analyzerName, options, '.', searchPaths);
 
       const engine = new RepoAnalyzerEngine(path.resolve(rootPath as string), logger);
 
-      const result = engine.run(analyzerInstance);
+      const result = engine.run(loadAnalyzerResult);
 
       if (args.json) {
         fs.writeFileSync(path.resolve(args.json as string), result.asJson());
@@ -112,7 +114,7 @@ function parseOptions(jsonStringOrPath?: string): object | undefined {
   process.exit(1);
 }
 
-function loadAnalyzer(name: string, ...args: any[]): any {
+function loadAnalyzer(name: string, options?: any, ...args: any[]) {
   const expectedFilePath = path.join(process.cwd(), 'dist', 'analyzers', `${ name }-analyzer.js`);
 
   if (!fs.existsSync(expectedFilePath)) {
@@ -120,7 +122,21 @@ function loadAnalyzer(name: string, ...args: any[]): any {
   }
 
   const analyzerExport = require(expectedFilePath)[pascalCase(`${ name }-analyzer`)];
-  const instance = new analyzerExport(...args);
+  const instance = new analyzerExport(...args, options);
+
+  if (isAnalyzerWithOptions(instance)) {    
+    const exampleOptions = instance.getExampleOptions();
+    const exampleOptionsAsJson = JSON.stringify(exampleOptions, null, 2);
+
+    if (!options) {
+      logger.error(`Analyzer requires options. Example Options: ${exampleOptionsAsJson}`);
+      process.exit(1);
+    }
+  }
 
   return instance;
+}
+
+function isAnalyzerWithOptions(arg: any): arg is RepoAnalyzerWithOptionsBase<any, any> {
+  return arg.getExampleOptions && typeof arg.getExampleOptions === 'function';
 }

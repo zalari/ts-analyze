@@ -15,8 +15,7 @@ export abstract class RepoAnalyzerWithOptionsBase<TResult, TOptions> extends Rep
    */
   constructor(public analysisRootPath: string, public analysisSearchPaths: string[] = ['.'], protected options: TOptions) {
     super(analysisRootPath, analysisSearchPaths);
-    if (!this.options) {
-      throw new Error('Analyzer requiring options was not supplied with options');
-    }
   }
+
+  abstract getExampleOptions(options?: any): TOptions;
 }

@@ -37,6 +37,12 @@ export class TemplateAnalyzer extends RepoAnalyzerWithOptionsBase<TemplateAnalyz
 
   }
 
+  getExampleOptions(options?: any): TemplateAnalyzerOptions {
+    return {
+      decoratorName: 'Test'
+    }
+  }
+
   getResult(): RepoAnalyzerResultBase<TemplateAnalyzerResult> {
     return new RepoAnalyzerResultBase({
       nameResults: this.nameResults,
