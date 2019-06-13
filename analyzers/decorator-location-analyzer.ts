@@ -43,7 +43,7 @@ export class DecoratorLocationAnalyzer extends RepoAnalyzerWithOptionsBase<Decor
 
   }
 
-  getExampleOptions(options?: any): DecoratorLocationAnalyzerOptions {
+  getExampleOptions(): DecoratorLocationAnalyzerOptions {
     return {
       decoratorName: 'Test'
     };

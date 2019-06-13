@@ -21,11 +21,12 @@ Especially in larger projects we want to **analyze** and **enforce** certain thi
 
 ## Creating an Analyzer
 
-Analyzers are classes that derive from the abstract `RepoAnalyzerBase<TResult>` class. They live in the `./analyzers` subdirectory and the file name must end with -analyzer.ts.
+Analyzers are classes that derive from the abstract `RepoAnalyzerBase` or `RepoAnalyzerWithOptionsBase`. They live in the `./analyzers` subdirectory and the file name must end with -analyzer.ts.
 
-The base class contains two main hook methods that need to be implemented:
+The base class contains two (or three) main hook methods that need to be implemented:
 * `initialize()`: This method is used for wiring up the parts of this analyzer. Usually this means registering some walkers, processing their results and then aggregate these into an object returned by `getResult()`.
 * `getResult()`: Returns the compiled result that this analyzer has generated after processing.
+* `getExampleOptions()`: Provides the CLI with example options (only applies to analyzer with options).
 
 ## Creating a Walker
 

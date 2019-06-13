@@ -17,5 +17,8 @@ export abstract class RepoAnalyzerWithOptionsBase<TResult, TOptions> extends Rep
     super(analysisRootPath, analysisSearchPaths);
   }
 
-  abstract getExampleOptions(options?: any): TOptions;
+  /**
+   * Provides the CLI with example options.
+   */
+  abstract getExampleOptions(): TOptions;
 }

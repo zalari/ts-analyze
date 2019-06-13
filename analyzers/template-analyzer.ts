@@ -37,7 +37,7 @@ export class TemplateAnalyzer extends RepoAnalyzerWithOptionsBase<TemplateAnalyz
 
   }
 
-  getExampleOptions(options?: any): TemplateAnalyzerOptions {
+  getExampleOptions(): TemplateAnalyzerOptions {
     return {
       decoratorName: 'Test'
     }
