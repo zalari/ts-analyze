@@ -1,4 +1,4 @@
-export function exportedFunction(){};
+export function exportedFunction() {};
 
 function TestDecorator(constructor: Function) {}
 
@@ -7,29 +7,29 @@ export class DecoratedClass {
 }
 
 export class ExternalClass {
-    public doWithInstanceAsArgument(arg: object) {
+  public doWithInstanceAsArgument(arg: object) {
 
-    }
+  }
 
-    public doWithTypeAsArgument(arg: any) {
+  public doWithTypeAsArgument(arg: any) {
 
-    }
+  }
 }
 
 export class UsingClass {
-    private _foo: ExternalClass;
+  private _foo: ExternalClass;
 
-    constructor() {
-        this._foo = new ExternalClass();
-    }
+  constructor() {
+    this._foo = new ExternalClass();
+  }
 
-    bar() {
-        const decoratedClassInstance = new DecoratedClass();
-        
-        this._foo.doWithInstanceAsArgument(decoratedClassInstance);
-        this._foo.doWithTypeAsArgument(DecoratedClass);
+  bar() {
+    const decoratedClassInstance = new DecoratedClass();
 
-        exportedFunction();
-    }
-    
+    this._foo.doWithInstanceAsArgument(decoratedClassInstance);
+    this._foo.doWithTypeAsArgument(DecoratedClass);
+
+    exportedFunction();
+  }
+
 }

@@ -1,6 +1,6 @@
 import * as Lint from 'tslint';
 import * as ts from 'typescript';
-import { ClassDecoratorFinder, DecoratorFinderResult, DecoratorFinderOptions } from '../walkers';
+import { ClassDecoratorFinder, DecoratorFinderOptions, DecoratorFinderResult } from '../walkers';
 import { FileSystemUtils } from '../src/api';
 
 const DEFAULT_DECORATOR_NAME = 'Message';

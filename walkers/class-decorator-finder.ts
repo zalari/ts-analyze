@@ -1,6 +1,6 @@
 import { SourceFile } from 'typescript';
 import { ClassDeclaration } from 'ts-morph';
-import { DecoratorFinderBase, DecoratorFinderOptions } from './decorator-finder-base';
+import { DecoratorFinderBase } from './decorator-finder-base';
 
 export class ClassDecoratorFinder extends DecoratorFinderBase<ClassDeclaration> {
   walk(sourceFile: SourceFile): void {

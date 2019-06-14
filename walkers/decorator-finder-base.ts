@@ -1,7 +1,7 @@
 import { SourceFile } from 'typescript';
-import { DecoratableNode, ClassDeclaration, MethodDeclaration, PropertyDeclaration } from 'ts-morph';
+import { ClassDeclaration, DecoratableNode, MethodDeclaration, PropertyDeclaration } from 'ts-morph';
 import { WalkerOptions } from '../src/interfaces/walker-options.interface';
-import { CodeWalkerResultBase, CodeWalkerBase } from '../src';
+import { CodeWalkerBase, CodeWalkerResultBase } from '../src';
 
 export interface DecoratorFinderOptions extends WalkerOptions {
   decoratorName: string | 'all';
@@ -26,7 +26,7 @@ export abstract class DecoratorFinderBase<TNode extends DecoratableNode> extends
         .map(v => { return { decoratorName: expectedDecoratorName, node }; });
     } else {
       if (node.getDecorator(expectedDecoratorName)) {
-        finderResults = [{ decoratorName: expectedDecoratorName, node  }];
+        finderResults = [{ decoratorName: expectedDecoratorName, node }];
       } else {
         finderResults = [];
       }

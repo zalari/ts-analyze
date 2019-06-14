@@ -8,7 +8,6 @@ import * as fs from 'fs';
 import { RepoAnalyzerEngine } from './classes/repo-analyzer-engine.class';
 import { pascalCase } from 'change-case';
 import { RepoAnalyzerWithOptionsBase } from './classes/repo-analyzer-with-options-base.class';
-import { RepoAnalyzerBase } from '.';
 
 const logger = winston.createLogger({
   transports: [
@@ -127,12 +126,12 @@ function loadAnalyzer(name: string, options?: any, ...args: any[]) {
   const analyzerExport = require(expectedFilePath)[pascalCase(`${ name }-analyzer`)];
   const instance = new analyzerExport(...args, options);
 
-  if (isAnalyzerWithOptions(instance)) {    
+  if (isAnalyzerWithOptions(instance)) {
     const exampleOptions = instance.getExampleOptions();
     const exampleOptionsAsJson = JSON.stringify(exampleOptions, null, 2);
 
     if (!options) {
-      logger.error(`Analyzer requires options. Example Options: ${exampleOptionsAsJson}`);
+      logger.error(`Analyzer requires options. Example Options: ${ exampleOptionsAsJson }`);
       process.exit(1);
     }
   }

@@ -1,6 +1,6 @@
 import { CodeWalkerResultBase, RepoAnalyzerResultBase, RepoAnalyzerWithOptionsBase } from '../src/api';
 import { ClassNameCollector } from '../walkers/class-name-collector';
-import { ClassDecoratorFinder, DecoratorFinderResult, DecoratorFinderOptions } from '../walkers/index';
+import { ClassDecoratorFinder, DecoratorFinderOptions, DecoratorFinderResult } from '../walkers/index';
 import { RepoAnalysisContext } from '../src/interfaces/repo-analysis-context.interface';
 
 interface TemplateAnalyzerResult {
@@ -39,7 +39,7 @@ export class TemplateAnalyzer extends RepoAnalyzerWithOptionsBase<TemplateAnalyz
   getExampleOptions(): TemplateAnalyzerOptions {
     return {
       decoratorName: 'Test'
-    }
+    };
   }
 
   getResult(): RepoAnalyzerResultBase<TemplateAnalyzerResult> {

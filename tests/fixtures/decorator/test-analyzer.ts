@@ -1,29 +1,37 @@
-import { RepoAnalyzerBase, RepoAnalysisContext, RepoAnalyzerResultBase } from "../../../src";
-import { DecoratorFinderResult, DecoratorFinderOptions, ClassDecoratorFinder } from "../../../walkers";
-import { PropertyAccessFinder, PropertyAccessFinderOptions, PropertyAccessFinderResult } from "../../../walkers/property-access-finder";
-import { Node, ClassDeclaration, CallExpression, PropertyAccessExpression, SyntaxKind } from 'ts-morph';
+import { RepoAnalysisContext, RepoAnalyzerBase, RepoAnalyzerResultBase } from '../../../src';
+import { ClassDecoratorFinder, DecoratorFinderOptions, DecoratorFinderResult } from '../../../walkers';
+import { PropertyAccessFinder, PropertyAccessFinderOptions, PropertyAccessFinderResult } from '../../../walkers/property-access-finder';
+import { ClassDeclaration, SyntaxKind } from 'ts-morph';
 
 export class TestAnalyzer extends RepoAnalyzerBase<any> {
   private _messageNameToNode = new Map<string, ClassDeclaration>();
+
   private _results: { className: string, propertyName: string }[] = [];
 
   initialize(context: RepoAnalysisContext): void {
     const options: DecoratorFinderOptions = { decoratorName: 'all' };
-    
+
     context.registerWalker(ClassDecoratorFinder, (results: DecoratorFinderResult[]) => this.handleDecoratorResults(results), options);
-    context.registerWalker(PropertyAccessFinder, (results: PropertyAccessFinderResult[]) => this.handleMethodResults(results), { kind: 'method', propertyName: 'doWithTypeAsArgument', typeName: 'ExternalClass' } as PropertyAccessFinderOptions);
+    context.registerWalker(PropertyAccessFinder, (results: PropertyAccessFinderResult[]) => this.handleMethodResults(results), {
+      kind: 'method',
+      propertyName: 'doWithTypeAsArgument',
+      typeName: 'ExternalClass'
+    } as PropertyAccessFinderOptions);
   }
 
   handleMethodResults(results: PropertyAccessFinderResult[]): void {
     results.forEach(result => {
-      result.data.expression.getParentIfKindOrThrow(SyntaxKind.CallExpression).getArguments().forEach(arg => {
-        const className = arg.getSymbolOrThrow().getEscapedName();
+      result.data.expression.getParentIfKindOrThrow(SyntaxKind.CallExpression)
+        .getArguments()
+        .forEach(arg => {
+          const className = arg.getSymbolOrThrow()
+            .getEscapedName();
 
-        if (this._messageNameToNode.has(className)) {
-          this._results.push({ className, propertyName: result.data.propertyName })
-        }
+          if (this._messageNameToNode.has(className)) {
+            this._results.push({ className, propertyName: result.data.propertyName });
+          }
 
-      });
+        });
     });
   }
 

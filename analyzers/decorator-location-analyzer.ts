@@ -1,5 +1,5 @@
 import { FileSystemUtils, RepoAnalysisContext, RepoAnalyzerResultBase, RepoAnalyzerWithOptionsBase } from '../src/api';
-import { ClassDecoratorFinder, DecoratorFinderResult, DecoratorFinderOptions } from '../walkers';
+import { ClassDecoratorFinder, DecoratorFinderOptions, DecoratorFinderResult } from '../walkers';
 import { Node } from 'ts-morph';
 
 interface DecoratorLocationAnalyzerResult {
