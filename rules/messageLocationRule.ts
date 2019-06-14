@@ -1,6 +1,6 @@
 import * as Lint from 'tslint';
 import * as ts from 'typescript';
-import { DecoratorFinder, DecoratorFinderResult } from '../walkers/decorator-finder';
+import { ClassDecoratorFinder, DecoratorFinderResult, DecoratorFinderOptions } from '../walkers';
 import { FileSystemUtils } from '../src/api';
 
 const DEFAULT_DECORATOR_NAME = 'Message';
@@ -9,16 +9,16 @@ const RULE_NAME = 'message-location';
 
 export class Rule extends Lint.Rules.AbstractRule {
   public apply(sourceFile: ts.SourceFile): Lint.RuleFailure[] {
-    const decoratorFinderOptions = DecoratorFinder.getDefaultOptions();
+
     const ruleArguments = this.getOptions().ruleArguments;
 
     let [decoratorName, expectedPackageName]: string[] = ruleArguments;
     decoratorName = decoratorName || DEFAULT_DECORATOR_NAME;
     expectedPackageName = expectedPackageName || DEFAULT_PACKAGE_NAME;
 
-    decoratorFinderOptions.decoratorName = decoratorName;
+    const decoratorFinderOptions: DecoratorFinderOptions = { decoratorName };
 
-    const decoratorFinder = new DecoratorFinder(sourceFile, RULE_NAME, decoratorFinderOptions);
+    const decoratorFinder = new ClassDecoratorFinder(sourceFile, RULE_NAME, decoratorFinderOptions);
     this.applyWithWalker(decoratorFinder);
 
     const results: DecoratorFinderResult[] = decoratorFinder.getResults();

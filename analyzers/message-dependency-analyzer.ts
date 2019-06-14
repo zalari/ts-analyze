@@ -1,5 +1,5 @@
 import { RepoAnalysisContext, RepoAnalyzerBase, RepoAnalyzerResultBase } from '../src/api';
-import { DecoratorFinder } from '../walkers/decorator-finder';
+import { ClassDecoratorFinder, DecoratorFinderOptions } from '../walkers';
 import { CodeWalkerNodeResult } from '../src/classes/code-walker-node-result.class';
 import { ClassDeclaration } from 'ts-morph';
 import { PropertyAccessFinderResult } from '../walkers/property-access-finder';
@@ -16,10 +16,9 @@ export class MessageDependencyAnalyzer extends RepoAnalyzerBase<MessageDependenc
 
   initialize(context: RepoAnalysisContext): void {
     this._context = context;
-    const options = DecoratorFinder.getDefaultOptions();
-    options.decoratorName = 'Message';
+    const options: DecoratorFinderOptions = { decoratorName: 'Message' };
 
-    context.registerWalker(DecoratorFinder, (results: CodeWalkerNodeResult[]) => this.handleDecoratorResults(results), options);
+    context.registerWalker(ClassDecoratorFinder, (results: CodeWalkerNodeResult[]) => this.handleDecoratorResults(results), options);
     context.registerWalker(FunctionCallFinder, (results: PropertyAccessFinderResult[]) => {}, { kind: 'method', name: '' });
   }
 

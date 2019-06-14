@@ -1,5 +1,5 @@
 import { FileSystemUtils, RepoAnalysisContext, RepoAnalyzerResultBase, RepoAnalyzerWithOptionsBase } from '../src/api';
-import { DecoratorFinder, DecoratorFinderResult } from '../walkers/decorator-finder';
+import { ClassDecoratorFinder, DecoratorFinderResult, DecoratorFinderOptions } from '../walkers';
 import { Node } from 'ts-morph';
 
 interface DecoratorLocationAnalyzerResult {
@@ -17,10 +17,9 @@ export class DecoratorLocationAnalyzer extends RepoAnalyzerWithOptionsBase<Decor
   private decoratedNodes: Node[] = [];
 
   initialize(context: RepoAnalysisContext): void {
-    const decoratorFinderOptions = DecoratorFinder.getDefaultOptions();
-    decoratorFinderOptions.decoratorName = this.options.decoratorName;
+    const decoratorFinderOptions: DecoratorFinderOptions = { decoratorName: this.options.decoratorName };
 
-    context.registerWalker(DecoratorFinder, (results: DecoratorFinderResult[]) => results.forEach(r => this.decoratedNodes.push(r.data.node)), decoratorFinderOptions);
+    context.registerWalker(ClassDecoratorFinder, (results: DecoratorFinderResult[]) => results.forEach(r => this.decoratedNodes.push(r.data.node)), decoratorFinderOptions);
   }
 
   getResult(): RepoAnalyzerResultBase<DecoratorLocationAnalyzerResult> {

@@ -1,6 +1,6 @@
 import { CodeWalkerResultBase, RepoAnalyzerResultBase, RepoAnalyzerWithOptionsBase } from '../src/api';
 import { ClassNameCollector } from '../walkers/class-name-collector';
-import { DecoratorFinder, DecoratorFinderResult } from '../walkers/decorator-finder';
+import { ClassDecoratorFinder, DecoratorFinderResult, DecoratorFinderOptions } from '../walkers/index';
 import { RepoAnalysisContext } from '../src/interfaces/repo-analysis-context.interface';
 
 interface TemplateAnalyzerResult {
@@ -26,9 +26,8 @@ export class TemplateAnalyzer extends RepoAnalyzerWithOptionsBase<TemplateAnalyz
     context.registerWalker(ClassNameCollector, (results: CodeWalkerResultBase[]) => this.handleClassNameResults(results));
 
     // Register a manual walker
-    const options = DecoratorFinder.getDefaultOptions();
-    options.decoratorName = this.options.decoratorName;
-    context.registerWalker(DecoratorFinder, (results: DecoratorFinderResult[]) => this.handleDecoratorResults(results), options);
+    const options: DecoratorFinderOptions = { decoratorName: this.options.decoratorName };
+    context.registerWalker(ClassDecoratorFinder, (results: DecoratorFinderResult[]) => this.handleDecoratorResults(results), options);
 
     // Register an independent handler
     context.registerHandler(file => {
