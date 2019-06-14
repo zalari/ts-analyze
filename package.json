@@ -7,7 +7,7 @@
     "build": "npm run clean && tsc --project .",
     "build:docs": "typedoc --out docs --exclude node_modules .",
     "clean": "shx rm -rf dist",
-    "start": "node ./dist/src/main run-analyzer --",
+    "start": "node ./dist/src/main run-analyzer",
     "test": "jest"
   },
   "author": "",
