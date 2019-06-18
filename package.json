@@ -1,8 +1,9 @@
 {
-  "name": "repo-analyzers",
-  "version": "1.0.0",
-  "description": "",
-  "main": "main.js",
+  "name": "@zalari/repo-analyzers",
+  "version": "0.1.0",
+  "description": "Infrastructure for analyzing TypeScript repository using static analysis.",
+  "private": true,
+  "main": "./dist/src/main.js",
   "scripts": {
     "build": "npm run clean && tsc --project .",
     "build:docs": "typedoc --out docs --exclude node_modules .",
@@ -10,8 +11,11 @@
     "start": "node ./dist/src/main run-analyzer",
     "test": "jest"
   },
-  "author": "",
+  "author": "Zalari GmbH",
   "license": "ISC",
+  "bin": {
+    "reas": "./dist/src/main.js"
+  },
   "dependencies": {
     "winston": "3.2.1"
   },
