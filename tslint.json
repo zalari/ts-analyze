@@ -1,6 +1,6 @@
 {
   "rulesDirectory": [
-    "dist/rules"
+    "rules/dist"
   ],
   "rules": {
     "no-imports": false,

@@ -1,16 +1,12 @@
 {
-  "name": "@zalari/repo-analyzers",
+  "name": "@zalari/repo-analyzers-common-walkers",
   "version": "0.1.0",
   "description": "Infrastructure for analyzing TypeScript repository using static analysis.",
-  "main": "./dist/src/main.js",
+  "main": "./dist/index.js",
   "scripts": {
-    "bootstrap": "lerna bootstrap --progress",
-    "build": "lerna run build --stream --bail --scope @zalari/repo-analyzers-*",
-    "build:docs": "lerna run build:docs --stream --bail --scope @zalari/repo-analyzers-*",
-    "clean": "lerna run clean --stream --bail --scope @zalari/repo-analyzers-*",
-    "init": "npm run bootstrap && npm run build",
-    "start": "lerna run start --stream --bail --scope @zalari/repo-analyzers-cli",
-    "test": "lerna exec --no-bail --scope @zalari/repo-analyzers-* -- npm test"
+    "build": "npm run clean && tsc --project .",
+    "clean": "shx rm -rf dist",
+    "test": "jest"
   },
   "author": "Zalari GmbH",
   "license": "ISC",
@@ -18,6 +14,7 @@
     "winston": "3.2.1"
   },
   "devDependencies": {
+    "@zalari/repo-analyzers-base": "*",
     "@types/change-case": "2.3.1",
     "@types/jest": "24.0.13",
     "@types/node": "12.0.8",

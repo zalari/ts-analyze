@@ -1,0 +1,33 @@
+{
+  "name": "@zalari/repo-analyzers-common-rules",
+  "version": "0.1.0",
+  "description": "Infrastructure for analyzing TypeScript repository using static analysis: Common TSlint Rules.",
+  "main": "./dist/src/main.js",
+  "scripts": {
+    "build": "npm run clean && tsc --project .",
+    "clean": "shx rm -rf dist"
+  },
+  "author": "Zalari GmbH",
+  "license": "ISC",
+  "dependencies": {
+    "winston": "3.2.1"
+  },
+  "devDependencies": {
+    "@zalari/repo-analyzers-base": "*",
+    "@zalari/repo-analyzers-common-walkers": "*",
+    "@types/change-case": "2.3.1",
+    "@types/jest": "24.0.13",
+    "@types/node": "12.0.8",
+    "@types/yargs": "13.0.0",
+    "change-case": "3.1.0",
+    "jest": "24.6.0",
+    "lerna": "^3.15.0",
+    "shx": "0.3.2",
+    "ts-jest": "24.0.2",
+    "ts-morph": "2.3.0",
+    "tslint": "5.17.0",
+    "typedoc": "0.14.2",
+    "typescript": "3.5.1",
+    "yargs": "13.2.4"
+  }
+}
