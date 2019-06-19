@@ -9,7 +9,6 @@ import { RepoAnalyzerEngine } from './classes/repo-analyzer-engine.class';
 import { pascalCase } from 'change-case';
 import { RepoAnalyzerWithOptionsBase } from './classes/repo-analyzer-with-options-base.class';
 
-
 class Main {
   private readonly logger: winston.Logger;
 
@@ -58,13 +57,24 @@ class Main {
             });
         }, (args) => {
 
-          const analyzerName = args.analyzer as string;
           const rootPath = args['analysis-root'];
           const options = this.parseOptions(args.options);
           const searchPaths = args.subPaths;
           const analyzersRoot = args['analyzers-root'];
 
-          const loadAnalyzerResult = this.loadAnalyzer(analyzersRoot, analyzerName, options, '.', searchPaths);
+          if (typeof args.analyzer !== 'string') {
+            throw new Error();
+          }
+
+          let pathToAnalyzer;
+
+          if (args.analyzer.endsWith('.js')) {
+            pathToAnalyzer = path.resolve(args.analyzer);
+          } else {
+            pathToAnalyzer = path.join(analyzersRoot, `${ args.analyzer }-analyzer.js`);
+          }
+
+          const loadAnalyzerResult = this.loadAnalyzer(pathToAnalyzer, options, '.', searchPaths);
 
           const engine = new RepoAnalyzerEngine(path.resolve(rootPath as string), this.logger);
 
@@ -89,17 +99,18 @@ class Main {
     process.exit(0);
   }
 
-  private loadAnalyzer(rootPath: string, name: string, options?: any, ...args: any[]) {
-    const expectedFilePath = path.join(rootPath, `${ name }-analyzer.js`);
-
+  private loadAnalyzer(expectedFilePath: string, options?: any, ...args: any[]) {
     if (!fs.existsSync(expectedFilePath)) {
       throw new Error(`Could not locate analyzer: ${ expectedFilePath }`);
     }
 
-    const analyzerExport = require(expectedFilePath)[pascalCase(`${ name }-analyzer`)];
+    const fileName = path.basename(expectedFilePath);
+    const expectedClassName = fileName.substring(0, fileName.length - 3);
+
+    const analyzerExport = require(expectedFilePath)[pascalCase(expectedClassName)];
     const instance = new analyzerExport(...args, options);
 
-    if (this.isAnalyzerWithOptions(instance)) {
+    if (Main.isAnalyzerWithOptions(instance)) {
       const exampleOptions = instance.getExampleOptions();
       const exampleOptionsAsJson = JSON.stringify(exampleOptions, null, 2);
 
@@ -112,11 +123,10 @@ class Main {
     return instance;
   }
 
-  private isAnalyzerWithOptions(arg: any): arg is RepoAnalyzerWithOptionsBase<any, any> {
+  private static isAnalyzerWithOptions(arg: any): arg is RepoAnalyzerWithOptionsBase<any, any> {
     return arg.getExampleOptions && typeof arg.getExampleOptions === 'function';
   }
-
-
+  
   private parseOptions(jsonStringOrPath?: string): object | undefined {
   if (!jsonStringOrPath) {
     return undefined;
