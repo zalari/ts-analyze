@@ -26,13 +26,13 @@ class Main {
   run() {
     try {
       yargs
-        .command('run-analyzer <analyzer> <path>', 'runs an analyzer on the provided path', (y) => {
+        .command('run-analyzer <analyzer> <analysis-root>', 'runs an analyzer on the provided path', (y) => {
           return y
             .positional('analyzer', {
               type: 'string',
               describe: 'analyzer to run'
             })
-            .positional('path', {
+            .positional('analysis-root', {
               type: 'string',
               describe: 'root path to run analyzer on'
             })
@@ -50,14 +50,21 @@ class Main {
               alias: 'j',
               type: 'string',
               describe: 'output analyzer result to specified json file'
+            })
+            .option('analyzers-root', {
+              type: 'string',
+              describe: 'root path where transpiled analyzers are located',
+              default: path.join(process.cwd(), './dist/analyzers'),
             });
         }, (args) => {
+
           const analyzerName = args.analyzer as string;
-          const rootPath = args.path;
+          const rootPath = args['analysis-root'];
           const options = this.parseOptions(args.options);
           const searchPaths = args.subPaths;
+          const analyzersRoot = args['analyzers-root'];
 
-          const loadAnalyzerResult = this.loadAnalyzer(analyzerName, options, '.', searchPaths);
+          const loadAnalyzerResult = this.loadAnalyzer(analyzersRoot, analyzerName, options, '.', searchPaths);
 
           const engine = new RepoAnalyzerEngine(path.resolve(rootPath as string), this.logger);
 
@@ -82,8 +89,8 @@ class Main {
     process.exit(0);
   }
 
-  private loadAnalyzer(name: string, options?: any, ...args: any[]) {
-    const expectedFilePath = path.join(process.cwd(), 'dist', 'analyzers', `${ name }-analyzer.js`);
+  private loadAnalyzer(rootPath: string, name: string, options?: any, ...args: any[]) {
+    const expectedFilePath = path.join(rootPath, `${ name }-analyzer.js`);
 
     if (!fs.existsSync(expectedFilePath)) {
       throw new Error(`Could not locate analyzer: ${ expectedFilePath }`);
