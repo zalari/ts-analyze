@@ -2,7 +2,7 @@ export function exportedFunction() {};
 
 function TestDecorator(constructor: Function) {}
 
-@TestDecorator
+@TestDecorator('foo', 'bar')
 export class DecoratedClass {
 }
 
