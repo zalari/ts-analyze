@@ -25,21 +25,26 @@ export abstract class DecoratorFinderBase<TNode extends DecoratableNode> extends
 
     if (expectedDecoratorName === 'all') {
       finderResults = node.getDecorators()
-        .map(decorator => { return { 
-          decoratorName: expectedDecoratorName, 
-          decoratedNode: node, 
-          decoratorNode: decorator,
-          callExpression: decorator.getFirstDescendantByKind(SyntaxKind.CallExpression) }; });
+        .map(decorator => {
+          return {
+            decoratorName: expectedDecoratorName,
+            decoratedNode: node,
+            decoratorNode: decorator,
+            callExpression: decorator.getFirstDescendantByKind(SyntaxKind.CallExpression)
+          };
+        });
     } else {
       let decorator = node.getDecorator(expectedDecoratorName);
 
       if (decorator) {
-        finderResults = [{ 
-          decoratorName: expectedDecoratorName, 
-          decoratedNode: node, 
-          decoratorNode: decorator,
-          callExpression: decorator.getFirstDescendantByKind(SyntaxKind.CallExpression)
-        }];
+        finderResults = [
+          {
+            decoratorName: expectedDecoratorName,
+            decoratedNode: node,
+            decoratorNode: decorator,
+            callExpression: decorator.getFirstDescendantByKind(SyntaxKind.CallExpression)
+          }
+        ];
       } else {
         finderResults = [];
       }
