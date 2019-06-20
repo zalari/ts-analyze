@@ -14,10 +14,13 @@ Especially in larger projects we want to **analyze** and **enforce** certain thi
 
 ## Project structure
 
-* `./src`: Contains the actual infrastructure used in writing analyzers/rules.
-* `./analyzers`: Contains the analyzers.
-* `./rules`: Contains custom TSLint rules.
-* `./walkers`: Contains the walkers used by both analyzers and rules.
+* `./base`: Contains the base classes for writing analyzers/rules and the engine for executing analyzers.
+* `./cli`: Contains the CLI tool for running analyzers from the command line.
+* `./analyzers`: Contains common analyzers.
+* `./rules`: Contains common TSLint rules.
+* `./walkers`: Contains common walkers used by both analyzers and rules.
+* `./utils`: Contains utility functions (currently used for testing).
+* `./example-client`: Contains an example client for the CLI.
 
 ## Creating an Analyzer
 
@@ -32,10 +35,11 @@ The base class contains two (or three) main hook methods that need to be impleme
 
 Walkers derive either from `CodeWalkerBase` or `CodeAutoWalkerBase` that offer two different ways of traversing the AST. It is preferred to use CodeWalkerBase for performance reasons.
 
-## Running an Analyzer
+## Running the Example Client
 
 First:
-* Prepare the project: `npm install`
-* Build the project: `npm run build`
 
-Then use `npm start -- [analyzer-name] [path] --options [options]`, e.g. if you want to run the TemplateAnalyzer on this project you would use `npm start -- template . --options "{ \"decoratorName\": \"Test\" }"`;
+* Prepare the project: `npm install`
+* Initialize the project: `npm run init`
+
+Navigate to `example-client` and then use `npm start`;
