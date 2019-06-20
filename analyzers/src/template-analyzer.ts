@@ -55,7 +55,7 @@ export class TemplateAnalyzer extends RepoAnalyzerWithOptionsBase<TemplateAnalyz
   }
 
   private handleDecoratorResults(results: DecoratorFinderResult[]) {
-    results.forEach(r => this.decoratorResults.push(CodeWalkerResultBase.create(r.data.node.getSourceFile()
+    results.forEach(r => this.decoratorResults.push(CodeWalkerResultBase.create(r.data.decoratedNode.getSourceFile()
       .getFilePath())));
   }
 }

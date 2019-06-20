@@ -19,7 +19,7 @@ export class DecoratorLocationAnalyzer extends RepoAnalyzerWithOptionsBase<Decor
   initialize(context: RepoAnalysisContext): void {
     const decoratorFinderOptions: DecoratorFinderOptions = { decoratorName: this.options.decoratorName };
 
-    context.registerWalker(ClassDecoratorFinder, (results: DecoratorFinderResult[]) => results.forEach(r => this.decoratedNodes.push(r.data.node)), decoratorFinderOptions);
+    context.registerWalker(ClassDecoratorFinder, (results: DecoratorFinderResult[]) => results.forEach(r => this.decoratedNodes.push(r.data.decoratedNode)), decoratorFinderOptions);
   }
 
   getResult(): RepoAnalyzerResultBase<DecoratorLocationAnalyzerResult> {

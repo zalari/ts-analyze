@@ -1,5 +1,5 @@
-import { SourceFile } from 'typescript';
-import { ClassDeclaration, DecoratableNode, MethodDeclaration, PropertyDeclaration } from 'ts-morph';
+import { SourceFile, SyntaxKind } from 'typescript';
+import { ClassDeclaration, DecoratableNode, MethodDeclaration, PropertyDeclaration, Decorator, CallExpression } from 'ts-morph';
 import { CodeWalkerOptions } from '@zalari/repo-analyzers-base';
 import { CodeWalkerBase, CodeWalkerResultBase } from '@zalari/repo-analyzers-base';
 
@@ -12,7 +12,9 @@ export interface DecoratorFinderResult extends CodeWalkerResultBase<DecoratorFin
 
 export interface DecoratorFinderResultData<T = ClassDeclaration | MethodDeclaration | PropertyDeclaration> {
   decoratorName: string;
-  node: T
+  decoratorNode: Decorator;
+  decoratedNode: T
+  callExpression?: CallExpression
 }
 
 export abstract class DecoratorFinderBase<TNode extends DecoratableNode> extends CodeWalkerBase<DecoratorFinderOptions> {
@@ -23,10 +25,21 @@ export abstract class DecoratorFinderBase<TNode extends DecoratableNode> extends
 
     if (expectedDecoratorName === 'all') {
       finderResults = node.getDecorators()
-        .map(v => { return { decoratorName: expectedDecoratorName, node }; });
+        .map(decorator => { return { 
+          decoratorName: expectedDecoratorName, 
+          decoratedNode: node, 
+          decoratorNode: decorator,
+          callExpression: decorator.getFirstDescendantByKind(SyntaxKind.CallExpression) }; });
     } else {
-      if (node.getDecorator(expectedDecoratorName)) {
-        finderResults = [{ decoratorName: expectedDecoratorName, node }];
+      let decorator = node.getDecorator(expectedDecoratorName);
+
+      if (decorator) {
+        finderResults = [{ 
+          decoratorName: expectedDecoratorName, 
+          decoratedNode: node, 
+          decoratorNode: decorator,
+          callExpression: decorator.getFirstDescendantByKind(SyntaxKind.CallExpression)
+        }];
       } else {
         finderResults = [];
       }

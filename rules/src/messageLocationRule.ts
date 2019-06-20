@@ -25,7 +25,7 @@ export class Rule extends Lint.Rules.AbstractRule {
     const failures: Lint.RuleFailure[] = [];
 
     results.forEach(result => {
-      const packageJson = FileSystemUtils.findPackageJsonForFile(result.data.node.getSourceFile()
+      const packageJson = FileSystemUtils.findPackageJsonForFile(result.data.decoratedNode.getSourceFile()
         .getFilePath());
 
       if (packageJson !== null) {
@@ -34,7 +34,7 @@ export class Rule extends Lint.Rules.AbstractRule {
         if (foundPackageName !== expectedPackageName) {
           const failureString = `Message with Decorator "@${ decoratorName }" is expected to be in package "${ expectedPackageName }" but was found in "${ foundPackageName }".`;
 
-          const failure = new Lint.RuleFailure(sourceFile, result.data.node.getStart(), result.data.node.getEnd(), failureString, RULE_NAME);
+          const failure = new Lint.RuleFailure(sourceFile, result.data.decoratedNode.getStart(), result.data.decoratedNode.getEnd(), failureString, RULE_NAME);
           failures.push(failure);
         }
       }
