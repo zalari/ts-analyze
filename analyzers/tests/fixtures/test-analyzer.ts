@@ -1,6 +1,5 @@
 import { RepoAnalysisContext, RepoAnalyzerBase, RepoAnalyzerResultBase } from '@zalari/repo-analyzers-base';
-import { ClassDecoratorFinder, DecoratorFinderOptions, DecoratorFinderResult } from '@zalari/repo-analyzers-common-walkers';
-import { PropertyAccessFinder, PropertyAccessFinderOptions, PropertyAccessFinderResult } from '@zalari/repo-analyzers-common-walkers';
+import { ClassDecoratorFinder, DecoratorFinderOptions, DecoratorFinderResult, PropertyAccessFinder, PropertyAccessFinderOptions, PropertyAccessFinderResult } from '@zalari/repo-analyzers-common-walkers';
 import { ClassDeclaration, SyntaxKind } from 'ts-morph';
 
 export class TestAnalyzer extends RepoAnalyzerBase<any> {
@@ -9,7 +8,7 @@ export class TestAnalyzer extends RepoAnalyzerBase<any> {
   private _results: { className: string, propertyName: string }[] = [];
 
   initialize(context: RepoAnalysisContext): void {
-    const options: DecoratorFinderOptions = { decoratorName: 'all' };
+    const options: DecoratorFinderOptions = { decoratorNames: 'all' };
 
     context.registerWalker(ClassDecoratorFinder, (results: DecoratorFinderResult[]) => this.handleDecoratorResults(results), options);
     context.registerWalker(PropertyAccessFinder, (results: PropertyAccessFinderResult[]) => this.handleMethodResults(results), {
@@ -41,7 +40,7 @@ export class TestAnalyzer extends RepoAnalyzerBase<any> {
 
   private handleDecoratorResults(results: DecoratorFinderResult[]) {
     results.forEach(result => {
-      this._messageNameToNode.set(result.data.node.getName()!, result.data.node as ClassDeclaration);
+      this._messageNameToNode.set(result.data.decoratedNode.getName()!, result.data.decoratedNode as ClassDeclaration);
     });
   }
 }

@@ -21,9 +21,9 @@ export class TestUtil {
     };
   }
 
-  public static runAnalyzer<T extends any>(analyzer: RepoAnalyzerBase<any>): RepoAnalyzerResultBase<T> {
+  public static runAnalyzer<T extends any>(analyzer: RepoAnalyzerBase<any>, respectErrors: boolean = true): RepoAnalyzerResultBase<T> {
     const engine = new RepoAnalyzerEngine(path.join(process.cwd() + '/tests/fixtures'));
-    const result = engine.run(analyzer, { respectErrors: true, sourceDiscoveryMode: SourceDiscoveryMode.All });
+    const result = engine.run(analyzer, { respectErrors, sourceDiscoveryMode: SourceDiscoveryMode.All });
 
     return result;
   }
