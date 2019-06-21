@@ -15,7 +15,7 @@ export class MessageDependencyAnalyzer extends RepoAnalyzerBase<MessageDependenc
 
   initialize(context: RepoAnalysisContext): void {
     this._context = context;
-    const options: DecoratorFinderOptions = { decoratorName: 'Message' };
+    const options: DecoratorFinderOptions = { decoratorNames: 'Message' };
 
     context.registerWalker(ClassDecoratorFinder, (results: CodeWalkerNodeResult[]) => this.handleDecoratorResults(results), options);
     context.registerWalker(FunctionCallFinder, (results: PropertyAccessFinderResult[]) => {}, { kind: 'method', name: '' });

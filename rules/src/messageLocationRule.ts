@@ -16,7 +16,7 @@ export class Rule extends Lint.Rules.AbstractRule {
     decoratorName = decoratorName || DEFAULT_DECORATOR_NAME;
     expectedPackageName = expectedPackageName || DEFAULT_PACKAGE_NAME;
 
-    const decoratorFinderOptions: DecoratorFinderOptions = { decoratorName };
+    const decoratorFinderOptions: DecoratorFinderOptions = { decoratorNames: decoratorName };
 
     const decoratorFinder = new ClassDecoratorFinder(sourceFile, RULE_NAME, decoratorFinderOptions);
     this.applyWithWalker(decoratorFinder);

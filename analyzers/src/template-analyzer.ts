@@ -26,7 +26,7 @@ export class TemplateAnalyzer extends RepoAnalyzerWithOptionsBase<TemplateAnalyz
     context.registerWalker(ClassNameCollector, (results: CodeWalkerResultBase[]) => this.handleClassNameResults(results));
 
     // Register a manual walker
-    const options: DecoratorFinderOptions = { decoratorName: this.options.decoratorName };
+    const options: DecoratorFinderOptions = { decoratorNames: this.options.decoratorName };
     context.registerWalker(ClassDecoratorFinder, (results: DecoratorFinderResult[]) => this.handleDecoratorResults(results), options);
 
     // Register an independent handler
