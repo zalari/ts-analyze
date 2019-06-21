@@ -6,12 +6,12 @@ export class PropertyDecoratorFinder extends DecoratorFinderBase<ClassDeclaratio
 
   walk(sourceFile: SourceFile): void {
     const file = this.wrap(sourceFile);
-    const { decoratorName } = this.options;
+    const { decoratorNames } = this.options;
     file.getClasses()
       .forEach(classNode => {
         classNode.getProperties()
           .forEach(propertyNode => {
-            this.analyze(propertyNode, decoratorName);
+            this.analyze(propertyNode, decoratorNames);
           });
       });
   }

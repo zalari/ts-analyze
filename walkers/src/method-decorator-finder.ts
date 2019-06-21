@@ -5,12 +5,12 @@ import { DecoratorFinderBase } from './decorator-finder-base';
 export class MethodDecoratorFinder extends DecoratorFinderBase<MethodDeclaration> {
   walk(sourceFile: SourceFile): void {
     const file = this.wrap(sourceFile);
-    const { decoratorName } = this.options;
+    const { decoratorNames } = this.options;
     file.getClasses()
       .forEach(classNode => {
         classNode.getMethods()
           .forEach(methodNode => {
-            this.analyze(methodNode, decoratorName);
+            this.analyze(methodNode, decoratorNames);
           });
       });
   }
