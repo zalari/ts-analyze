@@ -9,7 +9,7 @@
     "clean": "shx rm -rf dist"
   },
   "author": "Zalari GmbH",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "winston": "3.2.1"
   },

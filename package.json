@@ -13,7 +13,7 @@
     "test": "lerna exec --no-bail --scope @zalari/ts-analyze-* -- npm test"
   },
   "author": "Zalari GmbH",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "winston": "3.2.1"
   },

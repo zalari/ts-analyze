@@ -9,7 +9,7 @@
     "start": "node ./dist/main.js run-analyzer"
   },
   "author": "Zalari GmbH",
-  "license": "ISC",
+  "license": "MIT",
   "bin": {
     "ts-analyze": "./dist/bin/ts-analyze"
   },

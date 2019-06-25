@@ -4,7 +4,7 @@
   "description": "Infrastructure for analyzing TypeScript repository using static analysis: Example Client.",
   "private": true,
   "author": "Zalari GmbH",
-  "license": "ISC",
+  "license": "MIT",
   "scripts": {
     "start": "npx ts-analyze run-analyzer ../analyzers/dist/template-analyzer.js .. --options options.json --json result.json"
   },
