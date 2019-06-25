@@ -71,7 +71,7 @@ class Main {
           if (args.analyzer.endsWith('.js')) {
             pathToAnalyzer = path.resolve(args.analyzer);
           } else {
-            pathToAnalyzer = path.join(analyzersRoot, `${ args.analyzer }-analyzer.js`);
+            pathToAnalyzer = path.resolve(analyzersRoot, `${ args.analyzer }-analyzer.js`);
           }
 
           const loadAnalyzerResult = this.loadAnalyzer(pathToAnalyzer, options, '.', searchPaths);
