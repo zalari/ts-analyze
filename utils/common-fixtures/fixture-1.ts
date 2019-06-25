@@ -13,6 +13,7 @@ function TestDecorator4(target: any) {}
 
 @TestDecorator('foo', 'bar')
 @TestDecorator2
+@NonExistentDecorator
 export class DecoratedClass {
 }
 

@@ -41,6 +41,18 @@ test('Can get multiple class decorators explicitly', () => {
     .toBe(2);
 });
 
+test('Can get non-existent/without symbol class decorator explicitly', () => {
+  const code = TestUtil.getCodeForFixture('fixture-1');
+  const { sourceFile, context } = TestUtil.getStubsForWalker(code);
+
+  const finder = new ClassDecoratorFinder(sourceFile, '', { decoratorNames: 'NonExistentDecorator' }, context as unknown as RepoAnalysisContextImplementation);
+  finder.walk(sourceFile);
+  const results = finder.getResults();
+
+  expect(results.length)
+    .toBe(1);
+});
+
 test('Can get multiple class decorators implicitly', () => {
   const code = TestUtil.getCodeForFixture('fixture-1');
   const { sourceFile, context } = TestUtil.getStubsForWalker(code);
@@ -50,7 +62,7 @@ test('Can get multiple class decorators implicitly', () => {
   const results = finder.getResults();
 
   expect(results.length)
-    .toBe(2);
+    .toBe(3);
 });
 
 test('Can get method decorator explicitly', () => {
