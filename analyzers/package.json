@@ -1,5 +1,5 @@
 {
-  "name": "@zalari/ts-analyze-common-analyzers",
+  "name": "@zalari/ts-analyze-analyzers-common",
   "version": "0.1.0",
   "description": "Infrastructure for analyzing TypeScript repository using static analysis: Common Analyzers.",
   "scripts": {
@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "@zalari/ts-analyze-base": "*",
-    "@zalari/ts-analyze-common-walkers": "*",
+    "@zalari/ts-analyze-walkers-common": "*",
     "@types/change-case": "2.3.1",
     "@types/jest": "24.0.13",
     "@types/node": "12.0.8",

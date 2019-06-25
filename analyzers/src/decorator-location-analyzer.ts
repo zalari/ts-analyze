@@ -1,5 +1,5 @@
 import { FileSystemUtils, RepoAnalysisContext, RepoAnalyzerResultBase, RepoAnalyzerWithOptionsBase } from '@zalari/ts-analyze-base';
-import { ClassDecoratorFinder, DecoratorFinderOptions, DecoratorFinderResult } from '@zalari/ts-analyze-common-walkers';
+import { ClassDecoratorFinder, DecoratorFinderOptions, DecoratorFinderResult } from '@zalari/ts-analyze-walkers-common';
 import { Node } from 'ts-morph';
 
 interface DecoratorLocationAnalyzerResult {

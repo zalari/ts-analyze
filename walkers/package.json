@@ -1,5 +1,5 @@
 {
-  "name": "@zalari/ts-analyze-common-walkers",
+  "name": "@zalari/ts-analyze-walkers-common",
   "version": "0.1.0",
   "description": "Infrastructure for analyzing TypeScript repository using static analysis.",
   "main": "./dist/index.js",

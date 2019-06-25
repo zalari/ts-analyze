@@ -16,8 +16,8 @@
   "dependencies": {
     "winston": "3.2.1",
     "@zalari/ts-analyze-base": "*",
-    "@zalari/ts-analyze-common-analyzers": "*",
-    "@zalari/ts-analyze-common-walkers": "*"
+    "@zalari/ts-analyze-analyzers-common": "*",
+    "@zalari/ts-analyze-walkers-common": "*"
   },
   "devDependencies": {
     "@types/change-case": "2.3.1",
