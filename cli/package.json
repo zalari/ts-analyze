@@ -1,23 +1,23 @@
 {
-  "name": "@zalari/repo-analyzers-cli",
+  "name": "@zalari/ts-analyze-cli",
   "version": "0.1.0",
   "description": "Infrastructure for analyzing TypeScript repository using static analysis: CLI tool.",
   "main": "./dist/main.js",
   "scripts": {
-    "build": "npm run clean && tsc --project . && shx mkdir dist/bin && shx cp ./src/bin/reas ./dist/bin/",
+    "build": "npm run clean && tsc --project . && shx mkdir dist/bin && shx cp ./src/bin/ts-analyze ./dist/bin/",
     "clean": "shx rm -rf dist",
     "start": "node ./dist/main.js run-analyzer"
   },
   "author": "Zalari GmbH",
   "license": "ISC",
   "bin": {
-    "reas": "./dist/bin/reas"
+    "ts-analyze": "./dist/bin/ts-analyze"
   },
   "dependencies": {
     "winston": "3.2.1",
-    "@zalari/repo-analyzers-base": "*",
-    "@zalari/repo-analyzers-common-analyzers": "*",
-    "@zalari/repo-analyzers-common-walkers": "*"
+    "@zalari/ts-analyze-base": "*",
+    "@zalari/ts-analyze-common-analyzers": "*",
+    "@zalari/ts-analyze-common-walkers": "*"
   },
   "devDependencies": {
     "@types/change-case": "2.3.1",

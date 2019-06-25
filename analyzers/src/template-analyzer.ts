@@ -1,7 +1,7 @@
-import { CodeWalkerResultBase, RepoAnalyzerResultBase, RepoAnalyzerWithOptionsBase } from '@zalari/repo-analyzers-base';
-import { ClassNameCollector } from '@zalari/repo-analyzers-common-walkers';
-import { ClassDecoratorFinder, DecoratorFinderOptions, DecoratorFinderResult } from '@zalari/repo-analyzers-common-walkers';
-import { RepoAnalysisContext } from '@zalari/repo-analyzers-base';
+import { CodeWalkerResultBase, RepoAnalyzerResultBase, RepoAnalyzerWithOptionsBase } from '@zalari/ts-analyze-base';
+import { ClassNameCollector } from '@zalari/ts-analyze-common-walkers';
+import { ClassDecoratorFinder, DecoratorFinderOptions, DecoratorFinderResult } from '@zalari/ts-analyze-common-walkers';
+import { RepoAnalysisContext } from '@zalari/ts-analyze-base';
 
 interface TemplateAnalyzerResult {
   nameResults: CodeWalkerResultBase[];

@@ -1,16 +1,16 @@
 {
-  "name": "@zalari/repo-analyzers",
+  "name": "@zalari/ts-analyze",
   "version": "0.1.0",
   "description": "Infrastructure for analyzing TypeScript repository using static analysis.",
   "main": "./dist/src/main.js",
   "scripts": {
     "bootstrap": "lerna bootstrap --progress",
-    "build": "lerna run build --stream --bail --scope @zalari/repo-analyzers-*",
-    "build:docs": "lerna run build:docs --stream --bail --scope @zalari/repo-analyzers-*",
-    "clean": "lerna run clean --stream --bail --scope @zalari/repo-analyzers-*",
+    "build": "lerna run build --stream --bail --scope @zalari/ts-analyze-*",
+    "build:docs": "lerna run build:docs --stream --bail --scope @zalari/ts-analyze-*",
+    "clean": "lerna run clean --stream --bail --scope @zalari/ts-analyze-*",
     "init": "npm run bootstrap && npm run build",
-    "start": "lerna run start --stream --bail --scope @zalari/repo-analyzers-cli",
-    "test": "lerna exec --no-bail --scope @zalari/repo-analyzers-* -- npm test"
+    "start": "lerna run start --stream --bail --scope @zalari/ts-analyze-cli",
+    "test": "lerna exec --no-bail --scope @zalari/ts-analyze-* -- npm test"
   },
   "author": "Zalari GmbH",
   "license": "ISC",

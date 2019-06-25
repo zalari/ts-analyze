@@ -1,6 +1,6 @@
 import { SourceFile, SyntaxKind } from 'typescript';
 import { CallExpression, ClassDeclaration, DecoratableNode, Decorator, MethodDeclaration, PropertyDeclaration } from 'ts-morph';
-import { CodeWalkerBase, CodeWalkerOptions, CodeWalkerResultBase } from '@zalari/repo-analyzers-base';
+import { CodeWalkerBase, CodeWalkerOptions, CodeWalkerResultBase } from '@zalari/ts-analyze-base';
 
 export interface DecoratorFinderOptions extends CodeWalkerOptions {
   decoratorNames: string | 'all' | string[];

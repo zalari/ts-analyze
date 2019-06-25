@@ -1,4 +1,4 @@
-import { CodeWalkerBase, CodeWalkerResultBase } from '@zalari/repo-analyzers-base';
+import { CodeWalkerBase, CodeWalkerResultBase } from '@zalari/ts-analyze-base';
 import { SourceFile, SyntaxKind } from 'typescript';
 import { CallExpression, FunctionDeclaration, TypeGuards } from 'ts-morph';
 

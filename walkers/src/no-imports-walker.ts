@@ -1,6 +1,6 @@
 // This is an example from TSLint only changed to use our own walker base type.
 // The walker takes care of all the work.
-import { CodeAutoWalkerBase } from '@zalari/repo-analyzers-base';
+import { CodeAutoWalkerBase } from '@zalari/ts-analyze-base';
 import * as ts from 'typescript';
 
 export class NoImportsWalker extends CodeAutoWalkerBase {

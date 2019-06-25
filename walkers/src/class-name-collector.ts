@@ -1,4 +1,4 @@
-import { CodeAutoWalkerBase, CodeWalkerResultBase } from '@zalari/repo-analyzers-base';
+import { CodeAutoWalkerBase, CodeWalkerResultBase } from '@zalari/ts-analyze-base';
 import { ClassDeclaration } from 'typescript';
 
 export class ClassNameCollector extends CodeAutoWalkerBase {

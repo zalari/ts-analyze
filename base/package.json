@@ -1,5 +1,5 @@
 {
-  "name": "@zalari/repo-analyzers-base",
+  "name": "@zalari/ts-analyze-base",
   "version": "0.1.0",
   "description": "Infrastructure for analyzing TypeScript repository using static analysis: Base classes.",
   "main": "./dist/api.js",

@@ -1,7 +1,7 @@
 import * as Lint from 'tslint';
 import * as ts from 'typescript';
-import { ClassDecoratorFinder, DecoratorFinderOptions, DecoratorFinderResult } from '@zalari/repo-analyzers-common-walkers';
-import { FileSystemUtils } from '@zalari/repo-analyzers-base/dist/utils/file-system-utils';
+import { ClassDecoratorFinder, DecoratorFinderOptions, DecoratorFinderResult } from '@zalari/ts-analyze-common-walkers';
+import { FileSystemUtils } from '@zalari/ts-analyze-base/dist/utils/file-system-utils';
 
 const DEFAULT_DECORATOR_NAME = 'Message';
 const DEFAULT_PACKAGE_NAME = 'messages';

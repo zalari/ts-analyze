@@ -5,9 +5,9 @@ import * as winston from 'winston';
 import * as path from 'path';
 import * as fs from 'fs';
 
-import { RepoAnalyzerEngine } from '@zalari/repo-analyzers-base/dist/index';
+import { RepoAnalyzerEngine } from '@zalari/ts-analyze-base/dist/index';
 import { pascalCase } from 'change-case';
-import { RepoAnalyzerWithOptionsBase } from '@zalari/repo-analyzers-base';
+import { RepoAnalyzerWithOptionsBase } from '@zalari/ts-analyze-base';
 
 class Main {
   private readonly logger: winston.Logger;

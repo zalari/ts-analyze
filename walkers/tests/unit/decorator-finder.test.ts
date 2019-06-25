@@ -2,7 +2,7 @@ import { TestUtil } from '../../../utils/test-util';
 import { ClassDecoratorFinder } from '../../src/class-decorator-finder';
 import { MethodDecoratorFinder } from '../../src/method-decorator-finder';
 import { PropertyDecoratorFinder } from '../../src/property-decorator-finder';
-import { RepoAnalysisContextImplementation } from '@zalari/repo-analyzers-base/dist';
+import { RepoAnalysisContextImplementation } from '@zalari/ts-analyze-base/dist';
 import { DecoratorFinderResultData } from '../../src/decorator-finder-base';
 
 test('Sanity Check', () => {

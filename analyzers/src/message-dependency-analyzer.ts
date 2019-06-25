@@ -1,8 +1,8 @@
-import { RepoAnalysisContext, RepoAnalyzerBase, RepoAnalyzerResultBase, CodeWalkerNodeResult } from '@zalari/repo-analyzers-base';
-import { ClassDecoratorFinder, DecoratorFinderOptions } from '@zalari/repo-analyzers-common-walkers';
+import { RepoAnalysisContext, RepoAnalyzerBase, RepoAnalyzerResultBase, CodeWalkerNodeResult } from '@zalari/ts-analyze-base';
+import { ClassDecoratorFinder, DecoratorFinderOptions } from '@zalari/ts-analyze-common-walkers';
 import { ClassDeclaration } from 'ts-morph';
-import { PropertyAccessFinderResult } from '@zalari/repo-analyzers-common-walkers';
-import { FunctionCallFinder } from '@zalari/repo-analyzers-common-walkers';
+import { PropertyAccessFinderResult } from '@zalari/ts-analyze-common-walkers';
+import { FunctionCallFinder } from '@zalari/ts-analyze-common-walkers';
 
 interface MessageDependencyAnalyzerResult {
 

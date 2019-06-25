@@ -1,5 +1,5 @@
-import { RepoAnalysisContext, RepoAnalyzerBase, RepoAnalyzerResultBase } from '@zalari/repo-analyzers-base';
-import { ClassDecoratorFinder, DecoratorFinderOptions, DecoratorFinderResult, PropertyAccessFinder, PropertyAccessFinderOptions, PropertyAccessFinderResult } from '@zalari/repo-analyzers-common-walkers';
+import { RepoAnalysisContext, RepoAnalyzerBase, RepoAnalyzerResultBase } from '@zalari/ts-analyze-base';
+import { ClassDecoratorFinder, DecoratorFinderOptions, DecoratorFinderResult, PropertyAccessFinder, PropertyAccessFinderOptions, PropertyAccessFinderResult } from '@zalari/ts-analyze-common-walkers';
 import { ClassDeclaration, SyntaxKind } from 'ts-morph';
 
 export class TestAnalyzer extends RepoAnalyzerBase<any> {

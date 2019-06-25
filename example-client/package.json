@@ -1,14 +1,14 @@
 {
-  "name": "@zalari/repo-analyzers-example-client",
+  "name": "@zalari/ts-analyze-example-client",
   "version": "0.1.0",
   "description": "Infrastructure for analyzing TypeScript repository using static analysis: Example Client.",
   "private": true,
   "author": "Zalari GmbH",
   "license": "ISC",
   "scripts": {
-    "start": "npx reas run-analyzer ../analyzers/dist/template-analyzer.js .. --options options.json --json result.json"
+    "start": "npx ts-analyze run-analyzer ../analyzers/dist/template-analyzer.js .. --options options.json --json result.json"
   },
   "devDependencies": {
-    "@zalari/repo-analyzers-cli": "*"
+    "@zalari/ts-analyze-cli": "*"
   }
 }
