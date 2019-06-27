@@ -1,5 +1,5 @@
 import { SourceFile, SyntaxKind } from 'typescript';
-import { CallExpression, ClassDeclaration, DecoratableNode, Decorator, MethodDeclaration, PropertyDeclaration } from 'ts-morph';
+import { CallExpression, ClassDeclaration, DecoratableNode, Decorator, MethodDeclaration, PropertyDeclaration, Node } from 'ts-morph';
 import { CodeWalkerBase, CodeWalkerOptions, CodeWalkerResultBase } from '@zalari/ts-analyze-base';
 
 export interface DecoratorFinderOptions extends CodeWalkerOptions {
@@ -44,7 +44,7 @@ export abstract class DecoratorFinderBase<TNode extends DecoratableNode> extends
           finderResults.push(
             {
               decoratorName: expectedDecoratorName,
-              decoratedNode: node,
+              decoratedNode: this.languageService.attach(node as unknown as Node) as unknown as DecoratableNode,
               decoratorNode: decorator,
               callExpression: decorator.getFirstDescendantByKind(SyntaxKind.CallExpression)
             }
