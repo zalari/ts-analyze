@@ -1,6 +1,6 @@
 import { CodeWalkerBase, CodeWalkerResultBase } from '@zalari/ts-analyze-base';
 import { SourceFile, SyntaxKind } from 'typescript';
-import { CallExpression, FunctionDeclaration, TypeGuards } from 'ts-morph';
+import { CallExpression, FunctionDeclaration, TypeGuards, ImportSpecifier } from 'ts-morph';
 
 export interface FunctionCallFinderOptions extends FunctionCallFinderTarget {
 }
@@ -10,7 +10,7 @@ export class FunctionCallFinderResult extends CodeWalkerResultBase<FunctionCallF
 
 interface FunctionCallFinderTarget {
   functionName: string;
-  exportedFrom?: string;
+  origin?: string;
 }
 
 interface FunctionCallFinderResultData extends FunctionCallFinderTarget {
@@ -25,7 +25,7 @@ export class FunctionCallFinder extends CodeWalkerBase<FunctionCallFinderOptions
       .forEach(callExpression => {
         const identifier = callExpression.getLastChildByKind(SyntaxKind.Identifier);
 
-        const { functionName, exportedFrom } = this.options;
+        const { functionName, origin } = this.options;
 
         if (identifier) {
           const identifierSymbol = this.languageService.getSymbolSafe(identifier);
@@ -37,12 +37,21 @@ export class FunctionCallFinder extends CodeWalkerBase<FunctionCallFinderOptions
               const functionDeclaration = firstDeclaration as FunctionDeclaration;
 
               if (this.isFunctionNameConstraintSatisfied(functionDeclaration, functionName) &&
-                this.isExportConstraintSatisfied(functionDeclaration, exportedFrom)) {
+                this.isOriginConstraintSatisfied(functionDeclaration, origin)) {
+
                 this.addResult(new FunctionCallFinderResult({
                   ...this.options,
                   expression: this.languageService.attach(callExpression) as CallExpression
                 }));
               }
+            } else if (TypeGuards.isImportSpecifier(firstDeclaration) &&
+              identifierSymbol.getName() == functionName && 
+              this.isOriginConstraintSatisfied(firstDeclaration, origin)) {
+
+              this.addResult(new FunctionCallFinderResult({
+                ...this.options,
+                expression: this.languageService.attach(callExpression) as CallExpression
+              }));
             }
           }
         }
@@ -53,13 +62,19 @@ export class FunctionCallFinder extends CodeWalkerBase<FunctionCallFinderOptions
     return functionName === declaration.getName();
   }
 
-  private isExportConstraintSatisfied(declaration: FunctionDeclaration, exportName?: string) {
+  private isOriginConstraintSatisfied(origin: FunctionDeclaration | ImportSpecifier, exportName?: string) {
     if (!exportName) {
       return true;
     }
 
-    return declaration.getSourceFile()
-      .getFilePath()
-      .includes(exportName);
+    switch (origin.getKind()) {
+      case SyntaxKind.FunctionDeclaration: return origin.getSourceFile().getFilePath().includes(exportName);
+      case SyntaxKind.ImportSpecifier: {
+        const importSpecifier = origin as ImportSpecifier;
+
+        return importSpecifier.getImportDeclaration().getModuleSpecifier().getLiteralValue() === exportName;
+      }
+      default: return false;
+    }
   }
 }

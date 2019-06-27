@@ -18,7 +18,7 @@ test('Can find export from specific file', () => {
   const code = TestUtil.getCodeForFixture('fixture-1');
   const { sourceFile, context } = TestUtil.getStubsForWalker(code);
 
-  const finder = new FunctionCallFinder(sourceFile, '', { functionName: 'exportedFunction', exportedFrom: 'test-temp' }, context as unknown as RepoAnalysisContextImplementation);
+  const finder = new FunctionCallFinder(sourceFile, '', { functionName: 'exportedFunction', origin: 'test-temp' }, context as unknown as RepoAnalysisContextImplementation);
   finder.walk(sourceFile);
   const results = finder.getResults();
 
