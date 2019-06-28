@@ -9,6 +9,7 @@ import { SourceDiscoveryMode } from '../enums/source-discovery-mode.enum';
 import { RepoAnalyzerEngineRunOptions } from '../interfaces/repo-analyzer-engine-run-options.interface';
 import { CodeWalkerOptions } from '../interfaces/code-walker-options.interface';
 import { SourceFileHandler } from '../types/source-file-handler.type';
+import { AnalyzerProcessingMode } from '../enums/analyzer-processing-mode.enum';
 
 /**
  * Engine for running repo analyzers.
@@ -51,63 +52,121 @@ export class RepoAnalyzerEngine {
 
     const result: Map<RepoAnalyzerBase<any>, RepoAnalyzerResultBase<any>> = new Map();
 
+    // TODO: Refactor the hell out of this method. ASAP!
     analyzers.forEach(analyzer => {
       const compilationResult = this.compile(path.join(this._repoRootPath, analyzer.analysisRootPath), analyzer.analysisSearchPaths, sourceDiscoveryMode, respectErrors);
       const context = new RepoAnalysisContextImplementation(this, compilationResult.project, analyzer, this._logger);
 
       analyzer.initialize(context);
 
-      compilationResult.files.forEach(sourceFileTsMorph => {
-        this.runIndependentHandlers(analyzer, sourceFileTsMorph);
+      if (context.processingMode === AnalyzerProcessingMode.WalkersPerFile) {
+        compilationResult.files.forEach(sourceFileTsMorph => {
+          this.runIndependentHandlers(analyzer, sourceFileTsMorph);
 
-        const sourceFile = sourceFileTsMorph.compilerNode;
+          const sourceFile = sourceFileTsMorph.compilerNode;
+
+          const walkersToHandlers = this._analyzersToWalkers.get(analyzer)!;
+          walkersToHandlers.forEach((handlersWithOptions, walkerType) => {
+
+            if (this.isManualWalker(walkerType)) {
+              handlersWithOptions.forEach(handlerWithOptions => {
+                let walkerInstance;
+
+                if (handlerWithOptions.options && handlerWithOptions.options.sourceFilePaths) {
+                  const paths: string[] = handlerWithOptions.options.sourceFilePaths;
+
+                  if (paths.indexOf(sourceFile.fileName) !== -1) {
+                    walkerInstance = new walkerType(sourceFile, 'walker', handlerWithOptions.options, context);
+                  }
+
+                } else {
+                  walkerInstance = new walkerType(sourceFile, 'walker', handlerWithOptions.options, context);
+                }
+
+                walkerInstance.walk(sourceFile);
+
+                if (handlerWithOptions.handler) {
+                  const walkerResults = walkerInstance.getResults();
+                  handlerWithOptions.handler(walkerResults);
+                }
+              });
+
+            } else if (this.isAutoWalker(walkerType)) {
+              handlersWithOptions.forEach(handlerWithOptions => {
+                const options = {
+                  ...handlerWithOptions.options,
+                  ruleName: 'default',
+                  ruleArguments: [],
+                  ruleSeverity: 'off',
+                  disabledIntervals: []
+                };
+                const walkerInstance = new walkerType(sourceFile, options, context);
+                walkerInstance.walk(sourceFile);
+
+                if (handlerWithOptions.handler) {
+                  const walkerResults = walkerInstance.getResults();
+                  handlerWithOptions.handler(walkerResults);
+                }
+              });
+            }
+          });
+        });
+      } else {
+        compilationResult.files.forEach(sourceFileTsMorph => {
+          this.runIndependentHandlers(analyzer, sourceFileTsMorph);
+        });
 
         const walkersToHandlers = this._analyzersToWalkers.get(analyzer)!;
         walkersToHandlers.forEach((handlersWithOptions, walkerType) => {
 
-          if (this.isManualWalker(walkerType)) {
-            handlersWithOptions.forEach(handlerWithOptions => {
-              let walkerInstance;
+          compilationResult.files.forEach(sourceFileTsMorph => {
 
-              if (handlerWithOptions.options && handlerWithOptions.options.sourceFilePaths) {
-                const paths: string[] = handlerWithOptions.options.sourceFilePaths;
+            const sourceFile = sourceFileTsMorph.compilerNode;
 
-                if (paths.indexOf(sourceFile.fileName) !== -1) {
+            if (this.isManualWalker(walkerType)) {
+              handlersWithOptions.forEach(handlerWithOptions => {
+                let walkerInstance;
+
+                if (handlerWithOptions.options && handlerWithOptions.options.sourceFilePaths) {
+                  const paths: string[] = handlerWithOptions.options.sourceFilePaths;
+
+                  if (paths.indexOf(sourceFile.fileName) !== -1) {
+                    walkerInstance = new walkerType(sourceFile, 'walker', handlerWithOptions.options, context);
+                  }
+
+                } else {
                   walkerInstance = new walkerType(sourceFile, 'walker', handlerWithOptions.options, context);
                 }
 
-              } else {
-                walkerInstance = new walkerType(sourceFile, 'walker', handlerWithOptions.options, context);
-              }
+                walkerInstance.walk(sourceFile);
 
-              walkerInstance.walk(sourceFile);
+                if (handlerWithOptions.handler) {
+                  const walkerResults = walkerInstance.getResults();
+                  handlerWithOptions.handler(walkerResults);
+                }
+              });
 
-              if (handlerWithOptions.handler) {
-                const walkerResults = walkerInstance.getResults();
-                handlerWithOptions.handler(walkerResults);
-              }
-            });
+            } else if (this.isAutoWalker(walkerType)) {
+              handlersWithOptions.forEach(handlerWithOptions => {
+                const options = {
+                  ...handlerWithOptions.options,
+                  ruleName: 'default',
+                  ruleArguments: [],
+                  ruleSeverity: 'off',
+                  disabledIntervals: []
+                };
+                const walkerInstance = new walkerType(sourceFile, options, context);
+                walkerInstance.walk(sourceFile);
 
-          } else if (this.isAutoWalker(walkerType)) {
-            handlersWithOptions.forEach(handlerWithOptions => {
-              const options = {
-                ...handlerWithOptions.options,
-                ruleName: 'default',
-                ruleArguments: [],
-                ruleSeverity: 'off',
-                disabledIntervals: []
-              };
-              const walkerInstance = new walkerType(sourceFile, options, context);
-              walkerInstance.walk(sourceFile);
-
-              if (handlerWithOptions.handler) {
-                const walkerResults = walkerInstance.getResults();
-                handlerWithOptions.handler(walkerResults);
-              }
-            });
-          }
+                if (handlerWithOptions.handler) {
+                  const walkerResults = walkerInstance.getResults();
+                  handlerWithOptions.handler(walkerResults);
+                }
+              });
+            }
+          });
         });
-      });
+      }
 
       result.set(analyzer, analyzer.getResult());
     });
@@ -167,13 +226,13 @@ export class RepoAnalyzerEngine {
     const project = new Project({ compilerOptions });
 
     relativeSearchPaths.forEach(searchPath => {
-      const rootWithRelativePath = `${ path.join(compilerOptions.rootDir!, searchPath) }`;
+      const rootWithRelativePath = `${path.join(compilerOptions.rootDir!, searchPath)}`;
 
       if (sourceDiscoveryMode === SourceDiscoveryMode.TsConfig) {
         const tsConfigPaths = this.searchRecursive(rootWithRelativePath, 'tsconfig.json');
 
         tsConfigPaths.forEach(p => {
-          this._logger.info(`Found tsconfig.json at ${ p }. Adding to compilation`);
+          this._logger.info(`Found tsconfig.json at ${p}. Adding to compilation`);
           project.addSourceFilesFromTsConfig(p);
         });
       } else if (sourceDiscoveryMode === SourceDiscoveryMode.All) {
@@ -199,7 +258,7 @@ export class RepoAnalyzerEngine {
           file: diagnostic.getSourceFile() ? diagnostic.getSourceFile()!.getFilePath() : undefined
         }));
 
-        throw new Error(`Compilation has errors: ${ JSON.stringify(messages, null, 2) }`);
+        throw new Error(`Compilation has errors: ${JSON.stringify(messages, null, 2)}`);
       }
     }
 

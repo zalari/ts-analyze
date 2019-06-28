@@ -2,6 +2,7 @@ import { CodeWalkerResultHandler } from '..';
 import { CodeWalkerOptions } from './code-walker-options.interface';
 import { CodeWalkerResultBase } from '../classes/code-walker-result-base.class';
 import { SourceFileHandler } from '../types/source-file-handler.type';
+import { AnalyzerProcessingMode } from '../enums/analyzer-processing-mode.enum'
 
 /**
  * Represents the hook for communicating the run-time intent of this analyzer to the analyzer engine.
@@ -22,6 +23,12 @@ export interface RepoAnalysisContext {
    * @param options An optional options object to be supplied to the walker
    */
   registerWalker<TWalker extends { new(...args: any[]): InstanceType<TWalker> }, TResult extends CodeWalkerResultBase, TOptions extends CodeWalkerOptions>(walker: TWalker, handler: CodeWalkerResultHandler<TResult>, options?: TOptions): void;
+
+  /**
+   * Sets the mode/order in which the walkers will be called.
+   * @param mode
+   */
+  setProcessingMode(mode: AnalyzerProcessingMode): void;
 
   /**
    * Write an info message to the current logger.

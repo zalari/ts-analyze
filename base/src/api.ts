@@ -1,4 +1,5 @@
 export {
+  AnalyzerProcessingMode,
   CodeAutoWalkerBase,
   CodeWalkerBase,
   CodeWalkerNodeResult,

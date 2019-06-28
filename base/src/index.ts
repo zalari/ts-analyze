@@ -14,8 +14,10 @@ import { RepoAnalysisContext } from './interfaces/repo-analysis-context.interfac
 import { RepoAnalysisContextImplementation } from './classes/repo-analysis-context-implementation.class';
 import { RepoAnalyzerWithOptionsBase } from './classes/repo-analyzer-with-options-base.class';
 import { CodeWalkerOptions } from './interfaces/code-walker-options.interface';
+import { AnalyzerProcessingMode } from './enums/analyzer-processing-mode.enum';
 
 export {
+  AnalyzerProcessingMode,
   CodeAutoWalkerBase,
   CodeWalkerBase,
   CodeWalkerNodeResult,
