@@ -237,7 +237,7 @@ export class RepoAnalyzerEngine {
         });
       } else if (sourceDiscoveryMode === SourceDiscoveryMode.All) {
         const paths = this.searchRecursive(rootWithRelativePath, '.ts');
-        project.addExistingSourceFiles(paths);
+        project.addSourceFilesAtPaths(paths);
       }
       // Line below added searched node_modules as of ts-morph 2.0.1 which takes way too long.
       // project.addExistingSourceFiles(`${absoluteSearchPath}/**/*.ts`);

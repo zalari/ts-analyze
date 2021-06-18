@@ -1,6 +1,5 @@
 import { CodeWalkerBase, CodeWalkerResultBase } from '@zalari/ts-analyze-base';
-import { SourceFile, SyntaxKind } from 'typescript';
-import { CallExpression, FunctionDeclaration, TypeGuards, ImportSpecifier } from 'ts-morph';
+import { CallExpression, FunctionDeclaration, TypeGuards, ImportSpecifier, ts, SyntaxKind } from 'ts-morph';
 
 export interface FunctionCallFinderOptions extends FunctionCallFinderTarget {
 }
@@ -18,7 +17,7 @@ interface FunctionCallFinderResultData extends FunctionCallFinderTarget {
 }
 
 export class FunctionCallFinder extends CodeWalkerBase<FunctionCallFinderOptions> {
-  walk(sourceFile: SourceFile): void {
+  walk(sourceFile: ts.SourceFile): void {
     const file = this.wrap(sourceFile);
 
     file.getDescendantsOfKind(SyntaxKind.CallExpression)

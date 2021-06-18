@@ -1,7 +1,6 @@
 import { CodeWalkerImplementation, CodeWalkerImplementationInterface, CodeWalkerResultBase, RepoAnalysisContextImplementation } from '..';
-import { CompilerNodeToWrappedType, Node as TsMorphNode } from 'ts-morph';
+import { CompilerNodeToWrappedType, Node as TsMorphNode, ts } from 'ts-morph';
 import { AbstractWalker, Fix } from 'tslint';
-import { Node, SourceFile } from 'typescript';
 import { WalkerLanguageService } from './walker-language-service.class';
 
 /**
@@ -14,7 +13,7 @@ export abstract class CodeWalkerBase<TOptions> extends AbstractWalker<TOptions> 
 
   private readonly _implementation: CodeWalkerImplementation;
 
-  constructor(sourceFile: SourceFile, ruleName: string, options: TOptions, context?: RepoAnalysisContextImplementation) {
+  constructor(sourceFile: ts.SourceFile, ruleName: string, options: TOptions, context?: RepoAnalysisContextImplementation) {
     super(sourceFile, ruleName, options);
     this._implementation = new CodeWalkerImplementation(context);
   }
@@ -31,7 +30,7 @@ export abstract class CodeWalkerBase<TOptions> extends AbstractWalker<TOptions> 
    * @param sourceFile The source file object as supplied by the TypesScript API.
    * It is recommended that you use this with {@link wrap} for getting access to the ts-morph-based API.
    */
-  abstract walk(sourceFile: SourceFile): void;
+  abstract walk(sourceFile: ts.SourceFile): void;
 
   /**
    * @inheritdoc
@@ -57,7 +56,7 @@ export abstract class CodeWalkerBase<TOptions> extends AbstractWalker<TOptions> 
   /**
    * @inheritdoc
    */
-  wrap<T extends Node>(node: T): CompilerNodeToWrappedType<T> {
+  wrap<T extends ts.Node>(node: T): CompilerNodeToWrappedType<T> {
     return this._implementation.wrap(node);
   }
 
@@ -78,7 +77,7 @@ export abstract class CodeWalkerBase<TOptions> extends AbstractWalker<TOptions> 
   /**
    * @inheritdoc
    */
-  addFailureAtNode(node: Node, failure: string, fix?: Fix): void {
+  addFailureAtNode(node: ts.Node, failure: string, fix?: Fix): void {
     super.addFailureAtNode(node, failure, fix);
   }
 }

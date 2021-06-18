@@ -1,7 +1,6 @@
 import { CodeWalkerImplementation, CodeWalkerImplementationInterface, CodeWalkerResultBase, RepoAnalysisContextImplementation } from '..';
-import { CompilerNodeToWrappedType, Node as TsMorphNode } from 'ts-morph';
+import { CompilerNodeToWrappedType, ts, Node } from 'ts-morph';
 import { Fix, IOptions, RuleFailure, RuleWalker } from 'tslint';
-import { Node, SourceFile } from 'typescript';
 import { WalkerLanguageService } from './walker-language-service.class';
 
 /**
@@ -15,7 +14,7 @@ export abstract class CodeAutoWalkerBase extends RuleWalker implements CodeWalke
 
   private readonly _implementation: CodeWalkerImplementation;
 
-  constructor(sourceFile: SourceFile, options: IOptions = {
+  constructor(sourceFile: ts.SourceFile, options: IOptions = {
     ruleName: 'default',
     ruleArguments: [],
     ruleSeverity: 'off',
@@ -42,7 +41,7 @@ export abstract class CodeAutoWalkerBase extends RuleWalker implements CodeWalke
   /**
    * @inheritdoc
    */
-  attach<T extends TsMorphNode>(unattachedNode: T): TsMorphNode {
+  attach<T extends Node>(unattachedNode: T): Node {
     return this._implementation.attach(unattachedNode);
   }
 
@@ -56,7 +55,7 @@ export abstract class CodeAutoWalkerBase extends RuleWalker implements CodeWalke
   /**
    * @inheritdoc
    */
-  wrap<T extends Node>(node: T): CompilerNodeToWrappedType<T> {
+  wrap<T extends ts.Node>(node: T): CompilerNodeToWrappedType<T> {
     return this._implementation.wrap(node);
   }
 
@@ -81,7 +80,7 @@ export abstract class CodeAutoWalkerBase extends RuleWalker implements CodeWalke
   /**
    * @inheritdoc
    */
-  addFailureAtNode(node: Node, failure: string, fix?: Fix): void {
+  addFailureAtNode(node: ts.Node, failure: string, fix?: Fix): void {
     if (this.getSourceFile()) {
       super.addFailureAtNode(node, failure, fix);
     }

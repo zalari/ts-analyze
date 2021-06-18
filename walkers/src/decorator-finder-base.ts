@@ -1,5 +1,14 @@
-import { SourceFile, SyntaxKind } from 'typescript';
-import { CallExpression, ClassDeclaration, DecoratableNode, Decorator, MethodDeclaration, PropertyDeclaration, Node } from 'ts-morph';
+import {
+  CallExpression,
+  ClassDeclaration,
+  DecoratableNode,
+  Decorator,
+  MethodDeclaration,
+  PropertyDeclaration,
+  Node,
+  ts,
+  SyntaxKind
+} from 'ts-morph';
 import { CodeWalkerBase, CodeWalkerOptions, CodeWalkerResultBase } from '@zalari/ts-analyze-base';
 
 export interface DecoratorFinderOptions extends CodeWalkerOptions {
@@ -17,7 +26,7 @@ export interface DecoratorFinderResultData<T = ClassDeclaration | MethodDeclarat
 }
 
 export abstract class DecoratorFinderBase<TNode extends DecoratableNode> extends CodeWalkerBase<DecoratorFinderOptions> {
-  abstract walk(sourceFile: SourceFile): void;
+  abstract walk(sourceFile: ts.SourceFile): void;
 
   protected analyze(node: DecoratableNode, expectedDecoratorNames: 'all' | string | string[]) {
     let finderResults: DecoratorFinderResultData<DecoratableNode>[] = [];

@@ -1,6 +1,5 @@
 import { CodeWalkerBase, CodeWalkerResultBase } from '@zalari/ts-analyze-base';
-import { SourceFile, SyntaxKind } from 'typescript';
-import { CallExpression, ExpressionStatement, PropertyAccessExpression, Symbol } from 'ts-morph';
+import { CallExpression, ExpressionStatement, PropertyAccessExpression, Symbol, SyntaxKind, ts } from 'ts-morph';
 
 export interface PropertyAccessFinderOptions extends PropertyAccessFinderTarget {
 }
@@ -21,7 +20,7 @@ interface PropertyAccessFinderTarget {
 
 export class PropertyAccessFinder extends CodeWalkerBase<PropertyAccessFinderOptions> {
 
-  walk(sourceFile: SourceFile): void {
+  walk(sourceFile: ts.SourceFile): void {
     const file = this.wrap(sourceFile);
 
     const expectedTypeName = this.options.typeName;

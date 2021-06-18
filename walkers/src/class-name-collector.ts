@@ -1,8 +1,9 @@
+import { ts } from "ts-morph";
 import { CodeAutoWalkerBase, CodeWalkerResultBase } from '@zalari/ts-analyze-base';
 import { ClassDeclaration } from 'typescript';
 
 export class ClassNameCollector extends CodeAutoWalkerBase {
-  visitClassDeclaration(classDeclaration: ClassDeclaration): void {
+  visitClassDeclaration(classDeclaration: ts.ClassDeclaration): void {
     const className = this.wrap(classDeclaration)
       .getName();
 

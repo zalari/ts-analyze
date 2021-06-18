@@ -1,6 +1,6 @@
 import * as Lint from 'tslint';
-import * as ts from 'typescript';
 import { CodeAutoWalkerBase } from '@zalari/ts-analyze-base';
+import { ts } from 'ts-morph';
 
 export class Rule extends Lint.Rules.AbstractRule {
   public static FAILURE_STRING = 'import statement forbidden';
