@@ -3,7 +3,8 @@
     "base",
     "walkers",
     "analyzers",
-    "rules",
+    "rules-eslint",
+    "rules-tslint",
     "cli",
     "example-client"
   ],
