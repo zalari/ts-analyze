@@ -1,4 +1,4 @@
-import { CodeAutoWalkerBase, CodeWalkerBase, CodeWalkerResultBase, CodeWalkerResultHandler, RepoAnalysisContextImplementation, RepoAnalyzerBase, RepoAnalyzerResultBase } from '..';
+import { CodeWalkerResultBase, CodeWalkerResultHandler, RepoAnalysisContextImplementation, RepoAnalyzerBase, RepoAnalyzerResultBase } from '..';
 import fs from 'fs';
 import path from 'path';
 import winston from 'winston';

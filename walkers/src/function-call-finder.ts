@@ -1,5 +1,6 @@
-import { CodeWalkerBase, CodeWalkerResultBase } from '@zalari/ts-analyze-base';
+import { CodeWalkerResultBase } from '@zalari/ts-analyze-base';
 import { CallExpression, FunctionDeclaration, TypeGuards, ImportSpecifier, ts, SyntaxKind } from 'ts-morph';
+import { CodeWalkerBaseTsLint } from '@zalari/ts-analyze-base-walkers-tslint';
 
 export interface FunctionCallFinderOptions extends FunctionCallFinderTarget {
 }
@@ -16,7 +17,7 @@ interface FunctionCallFinderResultData extends FunctionCallFinderTarget {
   expression: CallExpression;
 }
 
-export class FunctionCallFinder extends CodeWalkerBase<FunctionCallFinderOptions> {
+export class FunctionCallFinder extends CodeWalkerBaseTsLint<FunctionCallFinderOptions> {
   walk(sourceFile: ts.SourceFile): void {
     const file = this.wrap(sourceFile);
 

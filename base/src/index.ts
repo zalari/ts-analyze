@@ -1,5 +1,3 @@
-import { CodeAutoWalkerBase } from './classes/code-auto-walker-base.class';
-import { CodeWalkerBase } from './classes/code-walker-base.class';
 import { CodeWalkerImplementation } from './classes/code-walker-implementation.class';
 import { CodeWalkerImplementationInterface } from './interfaces/code-walker-implementation.interface';
 import { CodeWalkerNodeResult } from './classes/code-walker-node-result.class';
@@ -15,11 +13,10 @@ import { RepoAnalysisContextImplementation } from './classes/repo-analysis-conte
 import { RepoAnalyzerWithOptionsBase } from './classes/repo-analyzer-with-options-base.class';
 import { CodeWalkerOptions } from './interfaces/code-walker-options.interface';
 import { AnalyzerProcessingMode } from './enums/analyzer-processing-mode.enum';
+import { WalkerLanguageService } from './classes/walker-language-service.class';
 
 export {
   AnalyzerProcessingMode,
-  CodeAutoWalkerBase,
-  CodeWalkerBase,
   CodeWalkerNodeResult,
   CodeWalkerImplementation,
   CodeWalkerImplementationInterface,
@@ -33,5 +30,6 @@ export {
   RepoAnalyzerEngine,
   RepoAnalyzerResultBase,
   RepoAnalysisContext,
-  RepoAnalysisContextImplementation
+  RepoAnalysisContextImplementation,
+  WalkerLanguageService,
 };

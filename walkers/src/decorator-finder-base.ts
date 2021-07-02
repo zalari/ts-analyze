@@ -9,7 +9,8 @@ import {
   ts,
   SyntaxKind
 } from 'ts-morph';
-import { CodeWalkerBase, CodeWalkerOptions, CodeWalkerResultBase } from '@zalari/ts-analyze-base';
+import { CodeWalkerOptions, CodeWalkerResultBase } from '@zalari/ts-analyze-base';
+import { CodeWalkerBaseTsLint } from '@zalari/ts-analyze-base-walkers-tslint';
 
 export interface DecoratorFinderOptions extends CodeWalkerOptions {
   decoratorNames: string | 'all' | string[];
@@ -25,7 +26,7 @@ export interface DecoratorFinderResultData<T = ClassDeclaration | MethodDeclarat
   callExpression?: CallExpression
 }
 
-export abstract class DecoratorFinderBase<TNode extends DecoratableNode> extends CodeWalkerBase<DecoratorFinderOptions> {
+export abstract class DecoratorFinderBase<TNode extends DecoratableNode> extends CodeWalkerBaseTsLint<DecoratorFinderOptions> {
   abstract walk(sourceFile: ts.SourceFile): void;
 
   protected analyze(node: DecoratableNode, expectedDecoratorNames: 'all' | string | string[]) {

@@ -1,5 +1,6 @@
-import { CodeWalkerBase, CodeWalkerResultBase } from '@zalari/ts-analyze-base';
+import { CodeWalkerResultBase } from '@zalari/ts-analyze-base';
 import { CallExpression, ExpressionStatement, PropertyAccessExpression, Symbol, SyntaxKind, ts } from 'ts-morph';
+import { CodeWalkerBaseTsLint } from '@zalari/ts-analyze-base-walkers-tslint';
 
 export interface PropertyAccessFinderOptions extends PropertyAccessFinderTarget {
 }
@@ -18,7 +19,7 @@ interface PropertyAccessFinderTarget {
   kind: 'method' | 'property';
 }
 
-export class PropertyAccessFinder extends CodeWalkerBase<PropertyAccessFinderOptions> {
+export class PropertyAccessFinder extends CodeWalkerBaseTsLint<PropertyAccessFinderOptions> {
 
   walk(sourceFile: ts.SourceFile): void {
     const file = this.wrap(sourceFile);

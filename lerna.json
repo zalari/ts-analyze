@@ -1,6 +1,7 @@
 {
   "packages": [
     "base",
+    "base-walkers-tslint",
     "walkers",
     "analyzers",
     "rules",

@@ -1,4 +1,4 @@
-import { ClassDeclaration, SourceFile, ts } from 'ts-morph';
+import { ClassDeclaration, ts } from 'ts-morph';
 import { DecoratorFinderBase } from './decorator-finder-base';
 
 export class PropertyDecoratorFinder extends DecoratorFinderBase<ClassDeclaration> {

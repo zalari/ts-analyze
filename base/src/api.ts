@@ -1,13 +1,20 @@
+import { CodeWalkerImplementation } from './classes/code-walker-implementation.class';
+import { CodeWalkerImplementationInterface } from './interfaces/code-walker-implementation.interface';
+import { CodeWalkerResultBase } from './classes/code-walker-result-base.class';
+import { RepoAnalysisContextImplementation } from './classes/repo-analysis-context-implementation.class';
+
 export {
   AnalyzerProcessingMode,
-  CodeAutoWalkerBase,
-  CodeWalkerBase,
   CodeWalkerNodeResult,
+  CodeWalkerImplementation,
+  CodeWalkerImplementationInterface,
   CodeWalkerOptions,
   CodeWalkerResultBase,
   FileSystemUtils,
   RepoAnalyzerBase,
   RepoAnalyzerResultBase,
   RepoAnalysisContext,
-  RepoAnalyzerWithOptionsBase
+  RepoAnalysisContextImplementation,
+  RepoAnalyzerWithOptionsBase,
+  WalkerLanguageService,
 } from './index';
